@@ -1,7 +1,7 @@
 #!/bin/sh
 set -x
 
-MODELS_DIR="$HOME/Desktop/validate_image/models"
+MODELS_DIR="./models"
 IMAGES_DIR="./images"
 CHANNEL=${1:-edge}
 
