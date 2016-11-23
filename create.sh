@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 MODELS_DIR="./models"
@@ -7,8 +7,8 @@ CHANNEL=${1:-edge}
 
 create(){
     rm -rf "$IMAGES_DIR" && mkdir -p "$IMAGES_DIR"
-    for platform in pc pi3 pi2 dragonboard; do
-        if [ "$platform" = "pc" ]; then
+    for platform in pc pc-i386 pi3 pi2 dragonboard; do
+        if [[ "$platform" =~ pc* ]]; then
             image_option="--image-size 3G"
         else
             image_option=""
