@@ -8,7 +8,7 @@ CHANNEL=${1:-edge}
 create(){
     rm -rf "$IMAGES_DIR" && mkdir -p "$IMAGES_DIR"
     for platform in pc pc-i386 pi3 pi2 dragonboard; do
-        if [[ "$platform" =~ pc* ]]; then
+        if [[ "$platform" == pc* ]]; then
             image_option="--image-size 3G"
         else
             image_option=""
