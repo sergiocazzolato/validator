@@ -15,7 +15,7 @@ create(){
             image_option=""
         fi
         output="${IMAGES_DIR}/${platform}-${CHANNEL}.img"
-        sudo /snap/bin/ubuntu-image "$image_option" -c "$CHANNEL" -o "$output" "$MODELS_DIR/${platform}.model"
+        sudo /snap/bin/ubuntu-image "$image_option" -c "$CHANNEL" -O "$output" "$MODELS_DIR/${platform}.model"
     done
 }
 
