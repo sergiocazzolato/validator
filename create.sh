@@ -7,7 +7,6 @@ CHANNEL=${1:-edge}
 PLATFORMS=${2:-"dragonboard pc pc-i386 pi3 pi2"}
 
 create(){
-    rm -rf "$IMAGES_DIR" && mkdir -p "$IMAGES_DIR"
     for platform in $PLATFORMS; do
         if [[ "$platform" == pc* ]]; then
             image_option="--image-size 3G"
@@ -15,6 +14,7 @@ create(){
             image_option=""
         fi
         output="${IMAGES_DIR}/${platform}-${CHANNEL}"
+        sudo rm -rf "$output" && mkdir -p "$output"
         sudo /snap/bin/ubuntu-image "$image_option" -c "$CHANNEL" -O "$output" "$MODELS_DIR/${platform}.model"
     done
 }
