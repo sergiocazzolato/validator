@@ -4,7 +4,7 @@ set -x
 MODELS_DIR="./models"
 IMAGES_DIR="./images"
 CHANNEL=${1:-edge}
-PLATFORMS=${2:-"dragonboard pc pc-i386 pi3 pi2"}
+PLATFORMS=${2:-"dragonboard pc-amd64 pc-i386 pi3 pi2"}
 
 create(){
     for platform in $PLATFORMS; do

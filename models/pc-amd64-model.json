@@ -3,7 +3,7 @@
   "authority-id": "ezPmSahqWjPQWhv3o4cY0MG0JkqpKIoL",
   "brand-id": "ezPmSahqWjPQWhv3o4cY0MG0JkqpKIoL",
   "series": "16",
-  "model": "pc",
+  "model": "pc-amd64",
   "architecture": "amd64",
   "gadget": "pc",
   "kernel": "pc-kernel",
