@@ -1,0 +1,74 @@
+summary: validate ubuntu-core snap
+
+prepare: |
+    sysctl -w net.ipv6.conf.all.disable_ipv6=1
+    trap "sysctl -w net.ipv6.conf.all.disable_ipv6=0" EXIT
+    apt update
+
+    if snap list; then
+        echo "snapd is already installed!"
+        exit 1
+    fi
+
+    apt install -y snapd jq
+
+restore: |
+    apt purge -y snapd jq
+    apt-get autoremove -y
+    rm -f oldVersion newVersion
+
+execute: |
+    change_id() {
+        # takes <summary pattern> [<status>]
+        local SUMMARY_PAT=$1
+        local STATUS=${2:-}
+        snap changes|grep -o -P "^\d+(?= *${STATUS}.*${SUMMARY_PAT}.*)"
+    }
+
+    snap version | awk "/^snapd / {print(\$2)}" > oldVersion
+
+    snap list 2>&1 | MATCH 'No snaps are installed yet.'
+
+    snap install ubuntu-core
+
+    # modify daemon state to set ubuntu-core-transition-last-retry-time to the
+    # current time to prevent the ubuntu-core transition
+    systemctl stop snapd.{service,socket}
+    now=$(date --utc -Ins)
+    cat /var/lib/snapd/state.json | jq -c '. + {data: (.data + {"ubuntu-core-transition-last-retry-time": "'"$now"'"})}' > state.json.new
+    mv state.json.new /var/lib/snapd/state.json
+    systemctl start snapd.{service,socket}
+
+    snap refresh --$UBUNTU_CORE_CHANNEL ubuntu-core
+
+    snap list | MATCH "ubuntu-core.*$TARGET_UBUNTU_CORE_REVISION"
+
+    snap version | awk "/^snapd / {print(\$2)}" > newVersion
+
+    test "$(cat newVersion)" != "$(cat oldVersion)"
+    test "$(cat newVersion)" = "$TARGET_SNAPD_VERSION"
+
+    snap install test-snapd-tools
+    /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
+
+    snap install test-snapd-python-webserver
+    snap interfaces | MATCH ":network-bind +test-snapd-python-webserver"
+
+    # restore ubuntu-core-transition-last-retry-time to its previous value and restart the daemon
+    systemctl stop snapd.{service,socket}
+    cat /var/lib/snapd/state.json | jq -c 'del(.["data"]["ubuntu-core-transition-last-retry-time"])' > state.json.new
+    mv state.json.new /var/lib/snapd/state.json
+    systemctl start snapd.{service,socket}
+
+    while ! snap changes|grep ".*Done.*Transition ubuntu-core to core"; do
+        snap changes
+        snap change $(change_id "Transition ubuntu-core to core")||true
+        sleep 1
+    done
+
+    if snap list|grep ubuntu-core; then
+        echo "ubuntu-core still installed, transition failed"
+        exit 1
+    fi
+
+    snap interfaces | MATCH ":network-bind +core,test-snapd-python-webserver"
