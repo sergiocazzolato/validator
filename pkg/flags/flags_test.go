@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/fgimenez/validator/pkg/flags"
+	"github.com/fgimenez/validator/pkg/types"
 )
 
 func TestParseReturnsParsedFlags(t *testing.T) {
 	var parsedFlags interface{}
 	parsedFlags = flags.Parse()
 
-	if v, ok := parsedFlags.(*flags.Options); !ok {
+	if v, ok := parsedFlags.(*types.Options); !ok {
 		t.Errorf("Parse didn't return options: %q", v)
 	}
 }
