@@ -6,11 +6,6 @@ var (
 	execCommand = exec.Command
 )
 
-// Commander comprises the methods required by a generic command executor
-type Commander interface {
-	ExecCommand(...string) (output string, err error)
-}
-
 // Executor is a concrete type for CLI execution
 type Executor struct{}
 
