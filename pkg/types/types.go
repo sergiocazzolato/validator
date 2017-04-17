@@ -10,7 +10,6 @@ type Options struct {
 type RunnerDependencies struct {
 	C  Cli
 	T  Testflinger
-	Sd Systemder
 	Sp Splitter
 }
 
@@ -24,12 +23,7 @@ type Testflinger interface {
 	GenerateCfg(*Options, []string) (string, error)
 }
 
-// Systemder comprises the methods related to systemd
-type Systemder interface {
-	TransientRunCmd(string) (string, string, error)
-}
-
 // Splitter has the methods needed to split the output of spread -list
 type Splitter interface {
-	Run(*Options) ([][]string, error)
+	Split(*Options) ([][]string, error)
 }

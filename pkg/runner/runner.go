@@ -24,7 +24,7 @@ func New(deps *types.RunnerDependencies) *Runner {
 }
 
 func (r *Runner) Run(options *types.Options) ([]string, error) {
-	chunks, err := r.splitter.Run(options)
+	chunks, err := r.splitter.Split(options)
 	if err != nil {
 		log.Printf("Error splitting suite: %v", err)
 		return nil, err
