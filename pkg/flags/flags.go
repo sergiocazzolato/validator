@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	DefaultSystem    = "ubuntu-core-16-64"
+	DefaultSystem    = "external:ubuntu-core-16-64"
 	DefaultExecutors = 4
 )
 
