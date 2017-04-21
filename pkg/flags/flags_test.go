@@ -62,25 +62,47 @@ func TestParseSetsExecutorsToDefaultValue(t *testing.T) {
 	}
 }
 
-func TestParseSetsOutputToFlagValue(t *testing.T) {
+func TestParseSetsChannelToFlagValue(t *testing.T) {
 	resetFlag()
 
-	os.Args = []string{"", "-output", "/home/user/output"}
+	os.Args = []string{"", "-channel", "mychannel"}
 	parsedFlags := flags.Parse()
 
-	if parsedFlags.Output != "/home/user/output" {
-		t.Errorf("output wasn't parsed: %q instead of /home/user/output", parsedFlags.Output)
+	if parsedFlags.Channel != "mychannel" {
+		t.Errorf("channel wasn't parsed: %q instead of mychannel", parsedFlags.Channel)
 	}
 }
 
-func TestParseSetsOutputToDefaultValue(t *testing.T) {
+func TestParseSetsChannelToDefaultValue(t *testing.T) {
 	resetFlag()
 
 	os.Args = []string{""}
 	parsedFlags := flags.Parse()
 
-	if parsedFlags.Output != flags.DefaultOutput {
-		t.Errorf("output wasn't set to default: %q instead of %q", parsedFlags.Output, flags.DefaultOutput)
+	if parsedFlags.Channel != flags.DefaultChannel {
+		t.Errorf("channel wasn't set to default: %q instead of %q", parsedFlags.Channel, flags.DefaultChannel)
+	}
+}
+
+func TestParseSetsFromToFlagValue(t *testing.T) {
+	resetFlag()
+
+	os.Args = []string{"", "-from", "myfrom"}
+	parsedFlags := flags.Parse()
+
+	if parsedFlags.From != "myfrom" {
+		t.Errorf("from wasn't parsed: %q instead of myfrom", parsedFlags.From)
+	}
+}
+
+func TestParseSetsFromToDefaultValue(t *testing.T) {
+	resetFlag()
+
+	os.Args = []string{""}
+	parsedFlags := flags.Parse()
+
+	if parsedFlags.From != flags.DefaultFrom {
+		t.Errorf("from wasn't set to default: %q instead of %q", parsedFlags.From, flags.DefaultFrom)
 	}
 }
 

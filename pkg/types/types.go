@@ -4,7 +4,8 @@ package types
 type Options struct {
 	System    string
 	Executors int
-	Output    string
+	Channel   string
+	From      string
 }
 
 // RunnerDependencies entails all the dependencies needed by a runner instance

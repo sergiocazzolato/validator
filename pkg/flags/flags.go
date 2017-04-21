@@ -9,7 +9,8 @@ import (
 const (
 	DefaultSystem    = "external:ubuntu-core-16-64"
 	DefaultExecutors = 4
-	DefaultOutput    = "/tmp"
+	DefaultChannel   = "edge"
+	DefaultFrom      = "target"
 )
 
 // Parse analyzes the given flags and return them inside an Options struct
@@ -17,13 +18,15 @@ func Parse() *types.Options {
 	var (
 		system    = flag.String("system", DefaultSystem, "spread system to execute the test on")
 		executors = flag.Int("executors", DefaultExecutors, "number of parallel testflinger executors")
-		output    = flag.String("output", DefaultOutput, "base directory to write the output configuration files")
+		channel   = flag.String("channel", DefaultChannel, "channel of the target snap to test")
+		from      = flag.String("from", DefaultFrom, "determines the channel from which initially provision the image, the target or stable")
 	)
 	flag.Parse()
 
 	return &types.Options{
 		System:    *system,
 		Executors: *executors,
-		Output:    *output,
+		Channel:   *channel,
+		From:      *from,
 	}
 }
