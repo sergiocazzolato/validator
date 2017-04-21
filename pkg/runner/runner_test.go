@@ -27,14 +27,10 @@ type fakeSplitter struct{}
 
 var splitReturn [][]string
 var splitCalls int
-var splitError bool
 
-func (fs *fakeSplitter) Split(options *types.Options, input []string) ([][]string, error) {
+func (fs *fakeSplitter) Split(options *types.Options, input []string) [][]string {
 	splitCalls++
-	if splitError {
-		return nil, errors.New("split error")
-	}
-	return splitReturn, nil
+	return splitReturn
 }
 
 type fakeTestflinger struct{}
@@ -104,17 +100,6 @@ func TestRunner(t *testing.T) {
 		}
 		if err.Error() != "cli error" {
 			t.Errorf("expected cli error, got %v", err)
-		}
-	})
-	t.Run("unhappy-path split error", func(t *testing.T) {
-		splitError = true
-		defer func() { splitError = false }()
-		output, err := s.Run(options)
-		if output != nil {
-			t.Errorf("expected nil output, got %v", output)
-		}
-		if err.Error() != "split error" {
-			t.Errorf("expected split error, got %v", err)
 		}
 	})
 	t.Run("unhappy-path genCfg error", func(t *testing.T) {
