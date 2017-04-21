@@ -25,5 +25,5 @@ type Testflinger interface {
 
 // Splitter has the methods needed to split the output of spread -list
 type Splitter interface {
-	Split(*Options, []string) ([][]string, error)
+	Split(*Options, []string) [][]string
 }

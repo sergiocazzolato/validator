@@ -31,11 +31,7 @@ func (r *Runner) Run(options *types.Options) ([]string, error) {
 		return nil, err
 	}
 
-	chunks, err := r.Splitter.Split(options, strings.Split(list, "\n"))
-	if err != nil {
-		log.Printf("Error splitting suite: %v", err)
-		return nil, err
-	}
+	chunks := r.Splitter.Split(options, strings.Split(list, "\n"))
 
 	var output []string
 	for _, chunk := range chunks {
