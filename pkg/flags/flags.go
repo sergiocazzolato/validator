@@ -9,6 +9,7 @@ import (
 const (
 	DefaultSystem    = "external:ubuntu-core-16-64"
 	DefaultExecutors = 4
+	DefaultOutput    = "/tmp"
 )
 
 // Parse analyzes the given flags and return them inside an Options struct
@@ -16,11 +17,13 @@ func Parse() *types.Options {
 	var (
 		system    = flag.String("system", DefaultSystem, "spread system to execute the test on")
 		executors = flag.Int("executors", DefaultExecutors, "number of parallel testflinger executors")
+		output    = flag.String("output", DefaultOutput, "base directory to write the output configuration files")
 	)
 	flag.Parse()
 
 	return &types.Options{
 		System:    *system,
 		Executors: *executors,
+		Output:    *output,
 	}
 }

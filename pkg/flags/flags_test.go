@@ -62,6 +62,28 @@ func TestParseSetsExecutorsToDefaultValue(t *testing.T) {
 	}
 }
 
+func TestParseSetsOutputToFlagValue(t *testing.T) {
+	resetFlag()
+
+	os.Args = []string{"", "-output", "/home/user/output"}
+	parsedFlags := flags.Parse()
+
+	if parsedFlags.Output != "/home/user/output" {
+		t.Errorf("output wasn't parsed: %q instead of /home/user/output", parsedFlags.Output)
+	}
+}
+
+func TestParseSetsOutputToDefaultValue(t *testing.T) {
+	resetFlag()
+
+	os.Args = []string{""}
+	parsedFlags := flags.Parse()
+
+	if parsedFlags.Output != flags.DefaultOutput {
+		t.Errorf("output wasn't set to default: %q instead of %q", parsedFlags.Output, flags.DefaultOutput)
+	}
+}
+
 // from flag.ResetForTesting
 func resetFlag() {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
