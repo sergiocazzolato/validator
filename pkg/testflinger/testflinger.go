@@ -32,11 +32,6 @@ test_data:
 `
 )
 
-const (
-	TplFromTargetFmt = ``
-	TplFromStableFmt = ``
-)
-
 type Testflinger struct{}
 
 func (t *Testflinger) GenerateCfg(options *types.Options, input [][]string) []string {
