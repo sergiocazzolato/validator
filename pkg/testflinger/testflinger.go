@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"github.com/fgimenez/validator/pkg/types"
 )
@@ -45,7 +46,8 @@ func (t *Testflinger) GenerateCfg(options *types.Options, input [][]string) []st
 	}
 
 	for _, item := range input {
-		content := []byte(fmt.Sprintf(tpl, options.Channel, item[0]))
+		mergedLines := strings.Join(item, " ")
+		content := []byte(fmt.Sprintf(tpl, options.Channel, mergedLines))
 
 		tmpfile, _ := ioutil.TempFile("", "")
 		if _, err := tmpfile.Write(content); err != nil {
