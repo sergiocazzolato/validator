@@ -40,4 +40,24 @@ func TestGenerateCfg(t *testing.T) {
 			}
 		})
 	})
+	t.Run("config file for single line, multigroup input", func(t *testing.T) {
+		input := [][]string{{"line0"}, {"line2"}, {"line3"}, {"line4"}}
+		result := subject.GenerateCfg(options, input)
+		for i, item := range input {
+			defer os.Remove(result[i])
+			file := fmt.Sprintf("file%d", i)
+			t.Run(file+" is created", func(t *testing.T) {
+				if _, err := os.Stat(result[i]); os.IsNotExist(err) {
+					t.Errorf("%v is not a file", item)
+				}
+			})
+			t.Run(file+" has the right content", func(t *testing.T) {
+				content, _ := ioutil.ReadFile(result[i])
+				expected := fmt.Sprintf(testflinger.FromTargetFmt, options.Channel, input[i][0])
+				if string(content) != expected {
+					t.Errorf("%s file content wrong, actual %s, expected %s", item, content, expected)
+				}
+			})
+		}
+	})
 }

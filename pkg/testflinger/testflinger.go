@@ -36,14 +36,16 @@ type Testflinger struct{}
 
 func (t *Testflinger) GenerateCfg(options *types.Options, input [][]string) []string {
 	var result []string
-	if len(input) > 0 {
-		var tpl string
-		if options.From == "stable" {
-			tpl = FromStableFmt
-		} else {
-			tpl = FromTargetFmt
-		}
-		content := []byte(fmt.Sprintf(tpl, options.Channel, input[0][0]))
+
+	var tpl string
+	if options.From == "stable" {
+		tpl = FromStableFmt
+	} else {
+		tpl = FromTargetFmt
+	}
+
+	for _, item := range input {
+		content := []byte(fmt.Sprintf(tpl, options.Channel, item[0]))
 
 		tmpfile, _ := ioutil.TempFile("", "")
 		if _, err := tmpfile.Write(content); err != nil {
@@ -52,7 +54,7 @@ func (t *Testflinger) GenerateCfg(options *types.Options, input [][]string) []st
 		if err := tmpfile.Close(); err != nil {
 			log.Fatal(err)
 		}
-		result = []string{tmpfile.Name()}
+		result = append(result, tmpfile.Name())
 	}
 	return result
 }
