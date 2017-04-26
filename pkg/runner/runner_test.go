@@ -2,7 +2,6 @@ package runner_test
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/fgimenez/validator/pkg/runner"
@@ -35,16 +34,12 @@ func (fs *fakeSplitter) Split(options *types.Options, input []string) [][]string
 
 type fakeTestflinger struct{}
 
-var generateCfgReturn string
+var generateCfgReturn []string
 var generateCfgCalls int
-var generateCfgError bool
 
-func (ts *fakeTestflinger) GenerateCfg(options *types.Options, input []string) (string, error) {
+func (ts *fakeTestflinger) GenerateCfg(options *types.Options, input [][]string) []string {
 	generateCfgCalls++
-	if generateCfgError {
-		return "", errors.New("generateCfg error")
-	}
-	return fmt.Sprintf("%s-%d", generateCfgReturn, generateCfgCalls), nil
+	return generateCfgReturn
 }
 
 func TestRunner(t *testing.T) {
@@ -60,7 +55,7 @@ func TestRunner(t *testing.T) {
 
 	cliReturn = "line1\nline2\nline3\nline4"
 	splitReturn = [][]string{{"line1"}, {"line2"}, {"line3"}, {"line4"}}
-	generateCfgReturn = "/tmp/output"
+	generateCfgReturn = []string{"/tmp/output1", "/tmp/output2"}
 
 	t.Run("happy-path", func(t *testing.T) {
 		output, err := s.Run(options)
@@ -75,7 +70,7 @@ func TestRunner(t *testing.T) {
 			}
 		})
 		t.Run("generateCfg is called", func(t *testing.T) {
-			if generateCfgCalls != len(splitReturn) {
+			if generateCfgCalls != 1 {
 				t.Errorf("expected %d call to generateCfg, obtained %d", len(splitReturn), generateCfgCalls)
 			}
 		})
@@ -83,8 +78,8 @@ func TestRunner(t *testing.T) {
 			if err != nil {
 				t.Errorf("expected nil error, got %v", err)
 			}
-			for i := 0; i < len(splitReturn); i++ {
-				expected := fmt.Sprintf("/tmp/output-%d", i+1)
+			for i := 0; i < len(generateCfgReturn); i++ {
+				expected := generateCfgReturn[i]
 				if output[i] != expected {
 					t.Errorf("expected output %s, got %s", expected, output[i])
 				}
@@ -100,17 +95,6 @@ func TestRunner(t *testing.T) {
 		}
 		if err.Error() != "cli error" {
 			t.Errorf("expected cli error, got %v", err)
-		}
-	})
-	t.Run("unhappy-path genCfg error", func(t *testing.T) {
-		generateCfgError = true
-		defer func() { generateCfgError = false }()
-		output, err := s.Run(options)
-		if output != nil {
-			t.Errorf("expected nil output, got %v", output)
-		}
-		if err.Error() != "generateCfg error" {
-			t.Errorf("expected generateCfg error, got %v", err)
 		}
 	})
 }

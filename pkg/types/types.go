@@ -22,7 +22,7 @@ type Cli interface {
 
 // Testflinger represents the methods to interact with the testflinger cli
 type Testflinger interface {
-	GenerateCfg(*Options, []string) (string, error)
+	GenerateCfg(*Options, [][]string) []string
 }
 
 // Splitter has the methods needed to split the output of spread -list

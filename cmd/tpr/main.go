@@ -1,18 +1,29 @@
 package main
 
+import (
+	"log"
+
+	"github.com/fgimenez/validator/pkg/cli"
+	"github.com/fgimenez/validator/pkg/flags"
+	"github.com/fgimenez/validator/pkg/runner"
+	"github.com/fgimenez/validator/pkg/splitter"
+	"github.com/fgimenez/validator/pkg/testflinger"
+	"github.com/fgimenez/validator/pkg/types"
+)
+
 func main() {
-	/*
-		options := flags.Parse()
+	options := flags.Parse()
 
-		deps := &types.RunnerDependencies{
-			C:  cli.New(),
-			T:  testflinger.New(),
-			Sp: splitter.New(),
-		}
-		runner := runner.New(deps)
+	deps := &types.RunnerDependencies{
+		Cli:         &cli.Executor{},
+		Testflinger: &testflinger.Testflinger{},
+		Splitter:    &splitter.Splitter{},
+	}
+	runner := runner.New(deps)
 
-		if err := runner.Run(options); err != nil {
-			log.Fatalf(err)
-		}
-	*/
+	list, err := runner.Run(options)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	log.Print(list)
 }
