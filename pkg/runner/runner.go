@@ -33,14 +33,7 @@ func (r *Runner) Run(options *types.Options) ([]string, error) {
 
 	chunks := r.Splitter.Split(options, strings.Split(list, "\n"))
 
-	var output []string
-	for _, chunk := range chunks {
-		cfgFile, err := r.Testflinger.GenerateCfg(options, chunk)
-		if err != nil {
-			log.Printf("Error generating testflinger config for chunk %v: %v", chunk, err)
-			return nil, err
-		}
-		output = append(output, cfgFile)
-	}
+	output := r.Testflinger.GenerateCfg(options, chunks)
+
 	return output, nil
 }
