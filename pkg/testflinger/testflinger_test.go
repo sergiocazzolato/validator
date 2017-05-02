@@ -15,6 +15,7 @@ func TestGenerateCfg(t *testing.T) {
 	subject := &testflinger.Testflinger{}
 	options := &types.Options{
 		Channel: "mychannel",
+		Release: "myrelease",
 	}
 	t.Run("empty input", func(t *testing.T) {
 		input := [][]string{}
@@ -35,7 +36,7 @@ func TestGenerateCfg(t *testing.T) {
 		})
 		t.Run("has the right content", func(t *testing.T) {
 			content, _ := ioutil.ReadFile(result[0])
-			expected := fmt.Sprintf(testflinger.FromTargetFmt, options.Channel, "line0")
+			expected := fmt.Sprintf(testflinger.FromTargetFmt, options.Channel, options.Release, "line0")
 			if string(content) != expected {
 				t.Errorf("%s file content wrong, actual %s, expected %s", result[0], content, expected)
 			}
@@ -54,7 +55,7 @@ func TestGenerateCfg(t *testing.T) {
 			})
 			t.Run(file+" has the right content", func(t *testing.T) {
 				content, _ := ioutil.ReadFile(result[i])
-				expected := fmt.Sprintf(testflinger.FromTargetFmt, options.Channel, input[i][0])
+				expected := fmt.Sprintf(testflinger.FromTargetFmt, options.Channel, options.Release, input[i][0])
 				if string(content) != expected {
 					t.Errorf("%s file content wrong, actual %s, expected %s", item, content, expected)
 				}
@@ -67,23 +68,42 @@ func TestGenerateCfg(t *testing.T) {
 			{"line0"},
 			{"line0", "line1", "line2", "line3", "line4"},
 			{"line0", "line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8"}}
-		result := subject.GenerateCfg(options, input)
-		for i, item := range input {
-			defer os.Remove(result[i])
-			file := fmt.Sprintf("file%d", i)
-			t.Run(file+" is created", func(t *testing.T) {
-				if _, err := os.Stat(result[i]); os.IsNotExist(err) {
-					t.Errorf("%v is not a file", item)
-				}
-			})
-			t.Run(file+" has the right content", func(t *testing.T) {
-				content, _ := ioutil.ReadFile(result[i])
-				mergedLines := strings.Join(input[i], " ")
-				expected := fmt.Sprintf(testflinger.FromTargetFmt, options.Channel, mergedLines)
-				if string(content) != expected {
-					t.Errorf("%s file content wrong, actual %s, expected %s", item, content, expected)
-				}
-			})
-		}
+		t.Run("file creation and general content", func(t *testing.T) {
+			result := subject.GenerateCfg(options, input)
+			for i, item := range input {
+				defer os.Remove(result[i])
+				file := fmt.Sprintf("file%d", i)
+				t.Run(file+" is created", func(t *testing.T) {
+					if _, err := os.Stat(result[i]); os.IsNotExist(err) {
+						t.Errorf("%v is not a file", item)
+					}
+				})
+				t.Run(file+" has the right content", func(t *testing.T) {
+					content, _ := ioutil.ReadFile(result[i])
+					mergedLines := strings.Join(input[i], " ")
+					expected := fmt.Sprintf(testflinger.FromTargetFmt, options.Channel, options.Release, mergedLines)
+					if string(content) != expected {
+						t.Errorf("%s file content wrong, actual %s, expected %s", item, content, expected)
+					}
+				})
+			}
+		})
+		t.Run("release branch checkout", func(t *testing.T) {
+			options := &types.Options{
+				Release: "myrelease",
+			}
+			result := subject.GenerateCfg(options, input)
+			for i, item := range input {
+				defer os.Remove(result[i])
+				file := fmt.Sprintf("file%d", i)
+				t.Run(file+" has the right content", func(t *testing.T) {
+					content, _ := ioutil.ReadFile(result[i])
+					expected := "git checkout myrelease"
+					if !strings.Contains(string(content), expected) {
+						t.Errorf("%s file content wrong, actual %s, expected to contain %s", item, content, expected)
+					}
+				})
+			}
+		})
 	})
 }

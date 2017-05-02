@@ -106,6 +106,28 @@ func TestParseSetsFromToDefaultValue(t *testing.T) {
 	}
 }
 
+func TestParseSetsReleaseToFlagValue(t *testing.T) {
+	resetFlag()
+
+	os.Args = []string{"", "-release", "myrelease"}
+	parsedFlags := flags.Parse()
+
+	if parsedFlags.Release != "myrelease" {
+		t.Errorf("release wasn't parsed: %q instead of myrelease", parsedFlags.Release)
+	}
+}
+
+func TestParseSetsReleaseToDefaultValue(t *testing.T) {
+	resetFlag()
+
+	os.Args = []string{""}
+	parsedFlags := flags.Parse()
+
+	if parsedFlags.Release != flags.DefaultRelease {
+		t.Errorf("release wasn't set to default: %q instead of %q", parsedFlags.Release, flags.DefaultRelease)
+	}
+}
+
 // from flag.ResetForTesting
 func resetFlag() {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
