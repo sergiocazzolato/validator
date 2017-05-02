@@ -11,6 +11,7 @@ const (
 	DefaultExecutors = 4
 	DefaultChannel   = "edge"
 	DefaultFrom      = "target"
+	DefaultRelease   = "master"
 )
 
 // Parse analyzes the given flags and return them inside an Options struct
@@ -20,6 +21,7 @@ func Parse() *types.Options {
 		executors = flag.Int("executors", DefaultExecutors, "number of parallel testflinger executors")
 		channel   = flag.String("channel", DefaultChannel, "channel of the target snap to test")
 		from      = flag.String("from", DefaultFrom, "determines the channel from which initially provision the image, the target or stable")
+		release   = flag.String("release", DefaultRelease, "release branch")
 	)
 	flag.Parse()
 
@@ -28,5 +30,6 @@ func Parse() *types.Options {
 		Executors: *executors,
 		Channel:   *channel,
 		From:      *from,
+		Release:   *release,
 	}
 }
