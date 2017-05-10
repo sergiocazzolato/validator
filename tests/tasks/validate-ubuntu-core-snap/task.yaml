@@ -29,7 +29,9 @@ execute: |
 
     snap list 2>&1 | MATCH 'No snaps are installed yet.'
 
-    snap install ubuntu-core
+    snap download --stable ubuntu-core
+    snap ack ./ubuntu-core_*.assert
+    snap install ./ubuntu-core_*.snap
 
     # modify daemon state to set ubuntu-core-transition-last-retry-time to the
     # current time to prevent the ubuntu-core transition
@@ -43,7 +45,10 @@ execute: |
     /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
     snap remove test-snapd-tools
 
-    snap refresh --$UBUNTU_CORE_CHANNEL ubuntu-core
+    rm -f ./ubuntu-core_*.{snap,assert}
+    snap download --${UBUNTU_CORE_CHANNEL} ubuntu-core
+    snap ack ./ubuntu-core_*.assert
+    snap install ./ubuntu-core_*.snap
 
     snap list | MATCH "ubuntu-core.*$TARGET_UBUNTU_CORE_REVISION"
 
