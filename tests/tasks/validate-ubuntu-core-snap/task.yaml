@@ -5,11 +5,7 @@ prepare: |
     trap "sysctl -w net.ipv6.conf.all.disable_ipv6=0" EXIT
     apt update
 
-    if snap list; then
-        echo "snapd is already installed!"
-        exit 1
-    fi
-
+    apt autoremove -y --purge snapd || true
     apt install -y snapd jq
 
 restore: |
