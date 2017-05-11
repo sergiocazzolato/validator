@@ -44,7 +44,9 @@ execute: |
     snap version | awk "/^snapd / {print(\$2)}" > newVersion
 
     test "$(cat newVersion)" != "$(cat oldVersion)"
-    test "$(cat newVersion)" = "$TARGET_SNAPD_VERSION"
+    if [ ! -z "$TARGET_SNAPD_VERSION" ]; then
+        test "$(cat newVersion)" = "$TARGET_SNAPD_VERSION"
+    fi
 
     snap install test-snapd-tools
     /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
