@@ -21,8 +21,6 @@ execute: |
         snap changes|grep -o -P "^\d+(?= *${STATUS}.*${SUMMARY_PAT}.*)"
     }
 
-    snap version | awk "/^snapd / {print(\$2)}" > oldVersion
-
     snap list 2>&1 | MATCH 'No snaps are installed yet.'
 
     snap download --${UBUNTU_CORE_CHANNEL} ubuntu-core
@@ -39,17 +37,11 @@ execute: |
 
     snap install test-snapd-tools
     /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
-    snap remove test-snapd-tools
 
-    snap version | awk "/^snapd / {print(\$2)}" > newVersion
-
-    test "$(cat newVersion)" != "$(cat oldVersion)"
     if [ ! -z "$TARGET_SNAPD_VERSION" ]; then
+        snap version | awk "/^snapd / {print(\$2)}" > newVersion
         test "$(cat newVersion)" = "$TARGET_SNAPD_VERSION"
     fi
-
-    snap install test-snapd-tools
-    /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
 
     snap install test-snapd-python-webserver
     snap interfaces | MATCH ":network-bind +test-snapd-python-webserver"
@@ -72,3 +64,5 @@ execute: |
     fi
 
     snap interfaces | MATCH ":network-bind +core,test-snapd-python-webserver"
+
+    /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
