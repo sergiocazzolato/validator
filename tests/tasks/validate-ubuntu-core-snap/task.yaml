@@ -41,9 +41,6 @@ execute: |
     /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
     snap remove test-snapd-tools
 
-
-    snap list | MATCH "ubuntu-core.*$TARGET_UBUNTU_CORE_REVISION"
-
     snap version | awk "/^snapd / {print(\$2)}" > newVersion
 
     test "$(cat newVersion)" != "$(cat oldVersion)"
