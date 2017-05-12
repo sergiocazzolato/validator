@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	DefaultSystem    = "external:ubuntu-core-16-64"
+	DefaultSystem    = "external:ubuntu-core-16-arm-64"
 	DefaultExecutors = 4
 	DefaultChannel   = "edge"
 	DefaultFrom      = "target"
