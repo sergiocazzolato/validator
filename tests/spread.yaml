@@ -4,7 +4,6 @@ path: /validate
 
 environment:
     UBUNTU_CORE_CHANNEL: "$(HOST: echo ${UBUNTU_CORE_CHANNEL:-beta})"
-    TARGET_SNAPD_VERSION: "$(HOST: echo ${SPREAD_TARGET_SNAPD_VERSION})"
 
 backends:
     linode:
