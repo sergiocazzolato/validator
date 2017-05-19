@@ -63,6 +63,6 @@ execute: |
         exit 1
     fi
 
-    snap interfaces | MATCH ":network-bind +core,test-snapd-python-webserver"
+    snap interfaces | MATCH ":network-bind +test-snapd-python-webserver"
 
     /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
