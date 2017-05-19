@@ -38,11 +38,6 @@ execute: |
     snap install test-snapd-tools
     /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
 
-    if [ ! -z "$TARGET_SNAPD_VERSION" ]; then
-        snap version | awk "/^snapd / {print(\$2)}" > newVersion
-        test "$(cat newVersion)" = "$TARGET_SNAPD_VERSION"
-    fi
-
     snap install test-snapd-python-webserver
     snap interfaces | MATCH ":network-bind +test-snapd-python-webserver"
 
