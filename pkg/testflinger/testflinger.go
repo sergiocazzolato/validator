@@ -15,7 +15,7 @@ provision_data:
     channel: %s
 test_data:
     test_cmds:
-        - sudo apt install -y git curl
+        - sudo apt update && sudo apt install -y git curl
         - git clone https://github.com/snapcore/snapd
         - curl -s -O https://niemeyer.s3.amazonaws.com/spread-amd64.tar.gz && tar xzvf spread-amd64.tar.gz
         - snapd/tests/lib/external/prepare-ssh.sh {device_ip} 22 ubuntu
@@ -26,7 +26,7 @@ provision_data:
     channel: stable
 test_data:
     test_cmds:
-        - sudo apt install -y git curl
+        - sudo apt update && sudo apt install -y git curl
         - git clone https://github.com/snapcore/snapd
         - curl -s -O https://niemeyer.s3.amazonaws.com/spread-amd64.tar.gz && tar xzvf spread-amd64.tar.gz
         - snapd/tests/lib/external/prepare-ssh.sh {device_ip} 22 ubuntu
