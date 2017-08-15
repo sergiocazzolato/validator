@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/fgimenez/validator/pkg/cli"
@@ -25,5 +26,6 @@ func main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	log.Print(list)
+	fmt.Println(list)
 }
+
