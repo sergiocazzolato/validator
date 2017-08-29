@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	FromTargetFmt = `job_queue: dragonboard
+	FromTargetFmt = `job_queue: %s
 provision_data:
     channel: %s
 test_data:
@@ -21,7 +21,7 @@ test_data:
         - snapd/tests/lib/external/prepare-ssh.sh {device_ip} 22 ubuntu
         - cd snapd && export SPREAD_EXTERNAL_ADDRESS={device_ip}:22 && git checkout %s && ../spread -v %s
 `
-	FromStableFmt = `job_queue: dragonboard
+	FromStableFmt = `job_queue: %s
 provision_data:
     channel: stable
 test_data:
@@ -49,7 +49,7 @@ func (t *Testflinger) GenerateCfg(options *types.Options, input [][]string) []st
 
 	for _, item := range input {
 		mergedLines := strings.Join(item, " ")
-		content := []byte(fmt.Sprintf(tpl, options.Channel, options.Release, mergedLines))
+		content := []byte(fmt.Sprintf(tpl, options.Queue, options.Channel, options.Release, mergedLines))
 
 		tmpfile, _ := ioutil.TempFile("", "")
 		if _, err := tmpfile.Write(content); err != nil {

@@ -12,6 +12,7 @@ const (
 	DefaultChannel   = "edge"
 	DefaultFrom      = "target"
 	DefaultRelease   = "master"
+	DefaultQueue     = "dragonboard"
 )
 
 // Parse analyzes the given flags and return them inside an Options struct
@@ -22,6 +23,7 @@ func Parse() *types.Options {
 		channel   = flag.String("channel", DefaultChannel, "channel of the target snap to test")
 		from      = flag.String("from", DefaultFrom, "determines the channel from which initially provision the image, the target or stable")
 		release   = flag.String("release", DefaultRelease, "release branch")
+		queue     = flag.String("queue", DefaultQueue, "testflinger queue")
 	)
 	flag.Parse()
 
@@ -31,5 +33,6 @@ func Parse() *types.Options {
 		Channel:   *channel,
 		From:      *from,
 		Release:   *release,
+		Queue:     *queue,
 	}
 }

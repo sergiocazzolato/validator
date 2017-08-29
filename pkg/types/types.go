@@ -7,6 +7,7 @@ type Options struct {
 	Channel   string
 	From      string
 	Release   string
+	Queue     string
 }
 
 // RunnerDependencies entails all the dependencies needed by a runner instance
