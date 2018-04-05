@@ -12,7 +12,7 @@ for platform in $PLATFORMS; do
     fi
     output="./images/${platform}-${CHANNEL}"
     sudo rm -rf "$output" && mkdir -p "$output"
-    sudo /snap/bin/ubuntu-image "$image_option" \
+    sudo /usr/bin/ubuntu-image "$image_option" \
          -c "$CHANNEL" \
          -O "$output" \
          "./models/${platform}.model"
