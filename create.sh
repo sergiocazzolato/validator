@@ -11,7 +11,7 @@ for platform in $PLATFORMS; do
     else
         image_option=""
     fi
-    output="./images/${platform}-${CHANNEL}"
+    output="./images/${platform}-${VERSION}-${CHANNEL}"
     sudo rm -rf "$output" && mkdir -p "$output"
     sudo /usr/bin/ubuntu-image "$image_option" \
          -c "$CHANNEL" \
