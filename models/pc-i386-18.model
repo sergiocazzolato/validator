@@ -1,0 +1,23 @@
+type: model
+authority-id: canonical
+series: 16
+brand-id: canonical
+model: core-i386-18
+architecture: i386
+base: core18
+display-name: Ubuntu Core 18
+gadget: pc
+kernel: pc-kernel=18
+timestamp: 2018-07-31T09:00:00+00:00
+sign-key-sha3-384: XaG_AJ8cDa7LpfRE9mn6ZXNgM_397tB_dmG4t6DISse_YWKygUSJKflNXAMACPaG
+
+AcLBcwQAAQoAHRYhBIqErnv1tWS/5173MWy8rbjLm9LKBQJbZACYAAoJEGy8rbjLm9LKMLsP+wZV
+SN6T1kdrHU8QGuLI6+fAX2rIlSHiV7pwMWyT/d2AVeeSzQKvOZ63jof6JYphUplaefMwnidibE2S
+r5r6NhnUc8g66I90MVsQKj1vyxu2hVAIkw2M77BB3M+UYrqjEttMyP9aT/MYh9B9fqFCsepNwaKj
+8/b8rcLUqALoiKLHa/9S68UOXWKfDl2GtfSeoU0JGxP8m9/RCi8wElRusAoFhSmGsoQSBOQcwdKX
+lADTY4JDW4bE0Lk4xuF5jvJQn1i6M9BmSoTSAHYY8yRBGWhKHIBSyF/vA+4PQiSc+cecpNZ2+fP+
+l2ETdTDyknXIr7LUNlB8DO/bz0EBnScvxHZgDFbDsjla91M53y723YHqxlAIp0P0NIaUEzhxzt3b
+e40rIh9AmpytLwv0Y/6Bbdx/IxeMXtSed4WiBAAQTDvEypwTObTfMYVe2flE83Q2RpvBdb7G9Yq8
+KIKQgxVhoHqYmLiElhjcuNxrylx8w8gRwwtzVyjWVdez5GTOH5MaYKrkYXbb7R6/b9M0UK3oNecZ
+99k/FddFtr7sZ1Cwf4SOYXgOsHInXjsK+RTiNFyn5bp/AncAj9d2qPzVd6EEJgEq6EaKLIqELvhJ
+1ExUnl5/LC/4gZ64NSEzLYDI11HMppYshbG0QA3tOz9sGfDEIgNEOp+lGe2fjplepVRCnIJQ

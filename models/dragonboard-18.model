@@ -1,0 +1,23 @@
+type: model
+authority-id: canonical
+series: 16
+brand-id: canonical
+model: core-dragonboard-18
+architecture: arm64
+base: core18
+display-name: Ubuntu Core 18
+gadget: dragonboard
+kernel: dragonboard-kernel=18
+timestamp: 2018-07-31T09:00:00+00:00
+sign-key-sha3-384: XaG_AJ8cDa7LpfRE9mn6ZXNgM_397tB_dmG4t6DISse_YWKygUSJKflNXAMACPaG
+
+AcLBcwQAAQoAHRYhBIqErnv1tWS/5173MWy8rbjLm9LKBQJbZACTAAoJEGy8rbjLm9LKUWIP/ir9
+alOqVhZzn+3Zl9Bn6NjBpE51qs94Os2oht1cbxO1xNmqlgTU4PiBg2sNy44RW3YLvfjrkfswLBxf
+StQfNOZjskTro1y1e5UjNkTrK3w7KhFaCzAhD+90ds1y2MGDB2ibcbCVhwKDGa4TaysGeG5+C3n2
+4drs3YoCPP34M38+YibOM47dhk5Am+4fpSqg4VNsSDqaI0Rk5tn1HkTzLVaLV935GMVAJgk6RSPj
+JY/rNh7ZTgfAwkmGM3QtFsMF03mpThNhb9/NfYeRH7NzrhLYysJ+yZYldvq6tlyNUQcQjjVDm5Hl
+FAgFdrLPzorqA7cVpoq1voTh1CMFyGALgXnNMS69Rm/iG2pS+JJCcNBt/EtDfiDHUtn6UuRj5U+J
+UL3YsF5IS4TjE4yHI6an+MD5KUdiv8f1//4qdOlc3zC7qyAPLEn6qoYxymOA72jDxnic3Mjh36kX
+4cf0cgdTMcmyFusRTWbZf8KRgEnVZ5D7/i9unFdlbPmOGXgseXeh0ViBPXYIkTChwOuXGr5FXnfK
+tXA3qHwJXKGCQ4WtyGswOQWaHzSPgPVNdg6+LK9E/5YaJARbl3bNZZhoz8sK0jU5CnYXhAcKSmoq
+T8Bjx8NzLbGSvbHgBelxJqvk5swgft5Nqb469lPD/Q+WeySCwCkBw9rfdFMOu129HKUQz0me
