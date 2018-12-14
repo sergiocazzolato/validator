@@ -2,8 +2,8 @@
 set -x
 
 CHANNEL=${1:-edge}
-PLATFORMS=${2:-"dragonboard pc-amd64 pc-i386 pi3 pi2"}
-VERSION=${3:-"16"}
+VERSION=${2:-"16"}
+PLATFORMS=${3:-"dragonboard pc-amd64 pc-i386 pi3 pi2"}
 
 for platform in $PLATFORMS; do
     if [[ "$platform" == pc* ]]; then
