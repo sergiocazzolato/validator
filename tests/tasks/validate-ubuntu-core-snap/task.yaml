@@ -9,8 +9,7 @@ prepare: |
     apt install -y snapd jq
 
 restore: |
-    apt purge -y snapd jq
-    apt-get autoremove -y
+    apt remove --purge -y snapd jq
     rm -f oldVersion newVersion
 
 execute: |
@@ -20,8 +19,6 @@ execute: |
         local STATUS=${2:-}
         snap changes|grep -o -P "^\d+(?= *${STATUS}.*${SUMMARY_PAT}.*)"
     }
-
-    snap list 2>&1 | MATCH 'No snaps are installed yet.'
 
     snap download --${UBUNTU_CORE_CHANNEL} ubuntu-core
     snap ack ./ubuntu-core_*.assert
@@ -60,4 +57,4 @@ execute: |
 
     snap interfaces | MATCH ":network-bind +test-snapd-python-webserver"
 
-    /snap/bin/test-snapd-tools.echo hello! | MATCH hello!
+    test-snapd-tools.echo hello! | MATCH hello!
