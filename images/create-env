@@ -1,12 +1,17 @@
+#!/bin/bash
 
-# git clone https://github.com/sergiocazzolato/validator.git
+git clone https://github.com/sergiocazzolato/validator.git
 
 sudo apt update
-sudo apt install -y ubuntu-image python3-pip
-sudo pip3 install flask
+sudo apt install -y ubuntu-image awscli snapcraft
 
+# run -> aws configure
+# run -> snapcraft login
+
+cd validator/images
 sudo cp image-generator.service /etc/systemd/system/
+sudo cp image-generator.timer /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable image-generator.service
-sudo systemctl start image-generator.service
+
+sudo systemctl enable image-generator.timer image-generator.service
 

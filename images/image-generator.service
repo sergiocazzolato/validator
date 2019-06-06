@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=root
 WorkingDirectory=/home/ubuntu/validator/images
-ExecStart=/home/ubuntu/validator/images/image-generator-server
+ExecStart=/home/ubuntu/validator/images/image-generator
 Restart=always
 
 [Install]

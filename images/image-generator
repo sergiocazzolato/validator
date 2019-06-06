@@ -1,0 +1,541 @@
+#!/usr/bin/env python3
+
+import glob
+import json
+import logging
+import os
+import psutil
+import shutil
+import subprocess
+import time
+
+S3_BUCKET_NAME = 's3://cachio/images'
+SUPPORTED_PLATFORMS = ['dragonboard','pc-amd64','pc-i386','pi3','pi2']
+SUPPORTED_CHANNELS = ['edge', 'beta', 'candidate', 'stable']
+SUPPORTED_VERSIONS = [16, 18]
+
+IMAGE_EXT = '.img'
+COMPRESSION_EXT = '.img.xz'
+SEED_MANIFEST_FILE = 'seed.manifest'
+IMAGES_INFO_FILE = 'images.json'
+IMAGES_DB_FILE = 'images_db.json'
+
+
+"""
+This represents an architecture used for images and snaps
+"""
+class Architecture:
+
+    PLATFORM_ARCH_MAP = {
+        'pi2': 'armhf', 
+        'pi3': 'armhf', 
+        'dragonboard': 'arm64', 
+        'pc-i386': 'i386', 
+        'pc-amd64': 'amd64'
+    }
+
+    @staticmethod
+    def from_platform(platform):
+        arch = Architecture.PLATFORM_ARCH_MAP.get(platform)
+        if not arch:
+            raise ValueError('Architecture not supported: {}'.format(arch))
+        return arch
+
+
+"""
+This represents a snap with a name and channel from which provides
+"""
+class Snap:
+ 
+    def __init__(self, definition, default_channel=None):
+        
+        self.name = definition.get('name')
+        self.channel = definition.get('channel', default_channel)
+
+        if not self.name:
+            raise ValueError('snap name not defined: {}'.format(definition))
+
+    def __repr__(self):
+        return str(self.__dict__())
+
+    def __dict__(self):
+        return {'name': self.name, 'channel': self.channel}
+
+    def __eq__(self, other):
+        return self.name == other.name and self.channel == other.channel
+
+    def __hash__(self):
+        return hash((self.name, self.channel))
+
+    @staticmethod
+    def check_name_and_revision(name, revision):
+        valid = True
+        try:
+            val = int(revision)
+        except ValueError:
+            valid = False
+            logging.error('Revision value is not integer: {}'.format(revision))
+
+        if not name:
+            valid = False
+            logging.error('Name not valid: {}'.format(name))
+
+        return valid
+
+    def find_revision(self, arch):
+        line = "snapcraft status {} --arch {} | grep ' {} '".format(self.name, arch, self.channel)
+        logging.info('Running command line: {}'.format(line))
+        
+        lines = subprocess.check_output(line, shell=True, encoding='utf8').splitlines()
+        if not len(lines) == 1:
+            logging.error('Incorrect output format for snapcraft status command: {}'.format(lines))
+            return
+
+        revision = lines[0].split(' ')[-1]
+        if Snap.check_name_and_revision(self.name, revision):
+            return revision
+
+        raise RuntimeError('Invalid revision: {} for snap: {}'.format(revision, self.name))
+
+
+"""
+This a snap with a revision
+"""
+class SnapVersion(Snap):
+    def __init__(self, definition, default_channel=None):
+        Snap.__init__(definition, default_channel)
+   
+        if not 'revision' in definition.keys():
+            raise ValueError('snap revision not defined: {}'.format(definition))
+        else:
+            self.revision = definition['revision']
+
+    def __repr__(self):        
+        return str(self.__dict__())
+
+    def __dict__(self):
+        return {
+            'name': self.name, 
+            'channel': self.channel, 
+            'revision': self.revision}
+
+    def __eq__(self, other):
+        return self.name == other.name and self.channel == other.channel and self.revision == other.revision
+
+    def __hash__(self):
+        return hash((self.name, self.channel, self.revision))
+
+
+"""
+This represents a trigger with is used to create a new image if needed
+"""
+class Trigger:
+ 
+    def __init__(self, definition):
+        self.snap = Snap(definition.get('snap'))
+
+    def __repr__(self):
+        return str(self.__dict__())
+
+    def __dict__(self):
+        return {'snap': self.snap.__dict__()}
+
+    def __eq__(self, other):
+        return self.snap.equals(other.snap)
+
+"""
+This represents a set of images with similar caracteristics but intended for 
+different platforms. 
+"""
+class ImageSet:
+    def __init__(self, definition):
+        self.images = []
+
+        platforms = definition.get('platforms')
+        if not platforms:
+            raise RuntimeError('Platforms not defined for image set')
+
+        for platform in platforms:
+            self.images.append(Image(definition, platform))
+
+    def __repr__(self):
+        return str(self.images)
+
+    def __eq__(self, other):
+        return set(self.images) == set(other.images)
+
+    def get_images(self):
+        return self.images
+
+
+"""
+Read the images_info_file file and generate a dict based on its content
+This file contains the information needed to generate the images and publish them
+"""
+class ImageSetManager:
+  
+    def __init__(self, image_set_path):
+        if not os.path.exists(image_set_path):
+            raise ValueError('Images file does not exist at: '.format(image_set_path))
+    
+        with open(image_set_path) as json_file:  
+            data = json.load(json_file)
+            
+            if not 'supported_images' in data.keys():
+                raise RuntimeError('Incorrect format found on file: {}'.format(image_set_path))
+
+            self.images_sets = []
+            for image_set_definition in data.get('supported_images'):
+                self.images_sets.append(ImageSet(image_set_definition))
+
+
+    def get_all_images(self):
+        all_images = []
+        for images_set in self.images_sets:
+            all_images.extend(images_set.get_images())
+
+        return all_images
+
+
+"""
+This class represents a manifest which contains the snaps and revisions for an image
+"""
+class ImageManifest:
+    def __init__(self, manifest_path=None, definition=None):
+        self.manifest = {}
+
+        if manifest_path:
+            self._load_from_path(manifest_path)
+
+        if definition:
+           self._load_from_definition(definition)
+
+    def __repr__(self):
+        return str(self.__dict__())
+
+    def __dict__(self):
+        return self.manifest
+
+    def __eq__(self, other):
+        shared_items = [
+            key for key in self.get_snap_names() if
+            key in other.get_snap_names() and 
+            self.manifest.get(key) == other.get(key)]
+
+        return len(self.get_snap_names()) == len(shared_items) and len(self.get_snap_names()) == len(other.get_snap_names())
+
+    def _load_from_definition(self, definition):
+        self.manifest = definition
+
+    def _load_from_path(self, manifest_path):
+        if not os.path.exists(manifest_path):
+            raise ValueError('No manifest in path: {}'.format(manifest_path))
+
+        with open(manifest_path, 'r') as file:
+            for line in file.readlines():
+                parts = line.split(' ')
+                if not len(parts) == 2:
+                    logging.warning('Manifest incorrect line: {}'.format(parts))
+                else:
+                    snap = parts[0].strip()
+                    revision = parts[1].strip()
+                    if Snap.check_name_and_revision(snap, revision):
+                        self.manifest.update({snap: revision})
+                    else:
+                        logging.warning('Manifest incorrect snap: {} and revision: {}'.format(snap, revision))
+
+    def get_snap_revision(self, snap):
+        return self.manifest.get(snap.name)
+
+    def get_snap_names(self):
+        return self.manifest.keys()
+
+    def empty(self):
+        return len(self.get_snap_names()) == 0
+
+
+"""
+This class represents an image with all its attributes and the including the triggers
+which are used to update
+"""
+class Image:
+    def __init__(self, definition, default_platform=None):
+        self.version = definition.get('version')
+        self.channel = definition.get('channel')
+        self.manifest = ImageManifest(definition=definition.get('manifest'))
+        self.platform = definition.get('platform', default_platform)
+
+        if not self.channel in SUPPORTED_CHANNELS:
+            raise ValueError('channel: {} not supported. Supported channels: {}'.format(self.channel, SUPPORTED_CHANNELS))
+
+        if not self.version in SUPPORTED_VERSIONS:
+            raise ValueError('version: {} not supported. Supported versions: {}'.format(self.channel, SUPPORTED_VERSIONS))
+
+        if not self.platform:
+            raise ValueError('platform list empty')
+    
+        if not self.platform in SUPPORTED_PLATFORMS:
+            raise ValueError('platform: {} not supported. Supported platform: {}'.format(self.platform, SUPPORTED_PLATFORMS))
+
+        self.triggers = []
+        for trigger in definition.get('triggers'):
+            self.triggers.append(Trigger(trigger))
+
+        self.snaps = []
+        for snap in definition.get('snaps'):
+            self.snaps.append(Snap(snap))
+
+        self.output_dir = self._get_output_dir()
+
+    def __repr__(self):        
+        return str(self.__dict__())
+
+    def __dict__(self):        
+        snaps_dict = []
+        for snap in self.snaps:
+            snaps_dict.append(snap.__dict__())            
+
+        triggers_dict = []
+        for trigger in self.triggers:
+            triggers_dict.append(trigger.__dict__())  
+
+        manifest_dict = self.manifest.__dict__()
+
+        return {
+            'version': self.version, 
+            'channel': self.channel, 
+            'manifest': manifest_dict, 
+            'snaps': snaps_dict, 
+            'triggers': triggers_dict,
+            'platform': self.platform}
+
+    def __eq__(self, other):
+        return self.version == other.version and \
+            self.channel == other.channel and \
+            self.manifest == other.manifest and \
+            self.platform == other.platform and \
+            set(self.snaps) == set(other.snaps)
+
+    def _get_output_dir(self):
+        output_dir = os.path.join('output', '{}-{}-{}'.format(self.platform, self.version, self.channel))
+        for snap in self.snaps:
+            output_dir = '{}-{}_{}'.format(output_dir, snap.name, snap.channel)
+
+        logging.info('Output dir used: {}'.format(output_dir))
+        return output_dir        
+
+    def _find_in_output_dir(self):
+        images = glob.glob('{}/*{}'.format(self.output_dir, IMAGE_EXT))
+        images.extend(glob.glob('{}/*{}'.format(self.output_dir, COMPRESSION_EXT)))
+        if len(images) == 1:
+            return images[0]
+
+    "This method is similar to __eq__ but it doesn't match the manifest"
+
+    def match(self, other):
+        return self.version == other.version and \
+            self.channel == other.channel and \
+            self.platform == other.platform and \
+            ( self.manifest == other.manifest or self.manifest.empty or other.manifest.empty ) and \
+            set(self.snaps) == set(other.snaps)
+
+
+    def get_image_already_created(self):
+        if os.path.isdir(self.output_dir):
+            return self._find_in_output_dir()
+
+    def read_manifest(self):
+        manifest_dict = {}
+        manifest_path = os.path.join(self.output_dir, SEED_MANIFEST_FILE)
+        
+        if not os.path.exists(manifest_path):
+            raise RuntimeError('Manifest file does not exist: {}'.format(manifest_path))
+
+        self.manifest = ImageManifest(manifest_path=manifest_path)
+
+
+"""
+This class Creates, compress and synchronize the ubuntu core images
+"""
+class ImageProcessor:
+    def __init__(self, image):
+        self.image = image
+
+    def _get_snap_list(self):
+        snap_list = []
+        for snap in self.image.snaps:
+            snap_param = '{}={}'.format(snap.name, snap.channel)
+            snap_list.append(snap_param)
+
+        return sorted(snap_list)
+
+    def get_image_options(self):
+        if self.image.platform.startswith('pc'):
+            return '--image-size 3G'
+        return ''
+
+    def get_snap_options(self):
+        snaps_option = ''
+        for snap in self._get_snap_list():
+            snaps_option = '{} --snap {}'.format(snaps_option, snap)
+        return snaps_option
+
+    def create_image(self):
+        # Clean the output dir
+        if os.path.isdir(self.image.output_dir):
+            shutil.rmtree(self.image.output_dir)
+            os.mkdir(self.image.output_dir)
+
+        # Create the image using ubuntu-image tool
+        image_option = self.get_image_options()
+        snaps_option = self.get_snap_options()
+        
+        line = "ubuntu-image {} {} -c {} -O {} ./models/{}-{}.model".format(
+            image_option, snaps_option, 
+            self.image.channel, self.image.output_dir, 
+            self.image.platform, self.image.version)
+
+        logging.info('Running command line: {}'.format(line))
+        subprocess.call(line, shell=True)
+
+        self.image.read_manifest()
+
+
+    def sync_image(self):
+        dirname = os.path.basename(self.image.output_dir)
+        line = 'aws s3 sync --acl public-read {} {}/{}'.format(S3_BUCKET_NAME, dirname, dirname)
+        subprocess.call(line, shell=True)
+
+    def compress_image(self):
+        image_path = self.image.get_image_already_created()
+
+        if image_path.endswith(COMPRESSION_EXT):
+            logging.warning('Image {} already compressed'.format(image_path))
+            return
+
+        line = 'xz {}'.format(image_path)
+        subprocess.call(line, shell=True)
+
+        if os.path.exists(image_path):
+            raise RuntimeError('Image file still exists after compress it')
+
+        if not os.path.exists('{}.xz'.format(image_path)):
+            raise RuntimeError('Image file with compression has not been created')
+
+    def process_image(self):
+        self.create_image()
+        self.compress_image()
+        self.sync_image()       
+
+        return self.image
+
+
+"""
+This class creates a list of images
+"""
+class ImagesManager:
+    def __init__(self, image_db_path):
+        self.image_db_path = image_db_path
+        self.images_db_data = []
+
+        if os.path.exists(self.image_db_path):           
+            self._read_image_db_file()
+
+    def _read_image_db_file(self):
+        with open(self.image_db_path) as json_file:
+            image_list = json.load(json_file)
+            for image in image_list:                
+                self.images_db_data.append(Image(image))
+
+
+    def _get_image_from_db(self, image):
+        for image_db in self.images_db_data:
+            if image_db.match(image):
+                return image_db
+
+    def is_new_image_needed(self, image):        
+        manifest = image.manifest
+        if not manifest or manifest.empty():
+            return True
+
+        for trigger in image.triggers:
+            trigger_snap = trigger.snap
+
+            try:
+                snap_revision_store = trigger_snap.find_revision(Architecture.from_platform(image.platform))
+            except Exception:
+                logging.error('Failed to get snap revision from store for snap {}'.format(trigger_snap))
+                return True
+            
+            snap_revision_manifest = manifest.get_snap_revision(trigger_snap)
+            if not snap_revision_manifest or snap_revision_store > snap_revision_manifest:
+                logging.info('Revision for snap {} on store is higher {} than in manifest {}'.format(
+                    trigger_snap, snap_revision_store, snap_revision_manifest))
+                return True
+
+        return False
+
+    def create_images(self, images):
+        created_images = []
+        for image in images:
+            logging.info('Starting with image: {}'.format(image))
+
+            image_db = self._get_image_from_db(image)
+            if image_db and not self.is_new_image_needed(image_db):
+                logging.info('No image needed for image: {}'.format(image_db))
+                created_images.append(image_db)
+                continue
+
+            processor = ImageProcessor(image)
+            image_new = processor.process_image()
+            if image_new:
+                logging.info('Image {} created and synchronized successfully'.format(image_new))
+                created_images.append(image_new)
+            else:
+                logging.error('Image {} could not be creater or synchronized correctly'.format(image))
+
+        return created_images
+
+    def write_images_db(self, images):
+        logging.info('Saving to images db: {}'.format(images))
+
+        images_dict = []
+        for image in images:
+            images_dict.append(image.__dict__())
+
+        with open(self.image_db_path, 'w') as json_file:
+            json.dump(images_dict, json_file)
+
+
+def is_image_generator_already_running():
+    count = 0
+    for proc in psutil.process_iter():
+        try:
+            pinfo = proc.as_dict(attrs=['pid', 'name', 'cmdline'])
+            if 'python3' == pinfo.get('name') and './image-generator' in pinfo.get('cmdline'):
+                count = count + 1
+        except psutil.NoSuchProcess:
+            return False
+
+    return count > 1
+
+
+def main():
+    images_sets_manager = ImageSetManager(IMAGES_INFO_FILE)
+    all_images = images_sets_manager.get_all_images()
+
+    images_manager = ImagesManager(IMAGES_DB_FILE)
+    used_images = images_manager.create_images(all_images)
+    images_manager.write_images_db(used_images)
+
+    if not used_images:
+        logging.warning('No images description to update')
+
+
+if __name__ == "__main__":
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+    if is_image_generator_already_running():
+        logging.warning('Image generator already being executed, skipping...')
+    
+    main()

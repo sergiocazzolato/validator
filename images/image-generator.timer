@@ -1,0 +1,9 @@
+[Unit]
+Description=Trigger checks to update ubuntu core images
+ 
+[Timer]
+OnCalendar=*:0/15
+Unit=image-generator.service
+
+[Install]
+WantedBy=multi-user.target

@@ -15,7 +15,11 @@ for platform in $PLATFORMS; do
     snaps=""
     if [ -n "$SNAPS" ]; then
         for snap in $SNAPS; do
-            snaps="$snaps --snap $snap"
+            if [ -z "$snaps" ]; then
+                snaps="--snap $snap"
+            else
+                snaps="$snaps --snap $snap"
+            fi
         done
     fi
 
