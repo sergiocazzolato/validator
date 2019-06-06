@@ -1,0 +1,27 @@
+#!/bin/bash
+
+CHANNEL=${1:-beta}
+VERSION=${2:-"16"}
+SNAPS=${3:-""}
+PLATFORM=${4:-"dragonboard"}
+
+if [ -z "$IMAGE_SERVICE_IP" ]; then
+	echo "Variable IMAGE_SERVICE_IP has to be defined, exiting..."
+	exit 1
+fi
+
+if ! command -v jq >/dev/null; then
+	echo "jq command is not available, exiting..."
+	exit 1	
+fi
+
+res=$(wget -qO- "http://${IMAGE_SERVICE_IP}/create?channel=${CHANNEL}&version=${VERSION}&snaps=${SNAPS}&platform=${PLATFORM}")
+
+if [[ $(echo "$res" | jq ".path") == null ]]; then
+	message=$(echo "$res" | jq ".message")
+	echo "ERROR=${message}"
+else
+	path=$(echo "$res" | jq ".path" | tr -d '"')
+	echo "IP=http://${IMAGE_SERVICE_IP}/${path}"
+fi
+

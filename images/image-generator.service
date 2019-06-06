@@ -1,0 +1,12 @@
+[Unit]
+Description=Image generator service
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/home/ubuntu/validator/images
+ExecStart=/home/ubuntu/validator/images/image-generator-server
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

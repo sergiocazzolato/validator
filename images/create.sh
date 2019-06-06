@@ -19,7 +19,7 @@ for platform in $PLATFORMS; do
         done
     fi
 
-    output="./images/${platform}-${VERSION}-${CHANNEL}"
+    output="./output/${platform}-${VERSION}-${CHANNEL}"
     sudo rm -rf "$output" && mkdir -p "$output"
     sudo ubuntu-image "$image_option" "$snaps" \
          -c "$CHANNEL" \

@@ -1,0 +1,12 @@
+
+# git clone https://github.com/sergiocazzolato/validator.git
+
+sudo apt update
+sudo apt install -y ubuntu-image python3-pip
+sudo pip3 install flask
+
+sudo cp image-generator.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable image-generator.service
+sudo systemctl start image-generator.service
+
