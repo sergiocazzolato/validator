@@ -3,10 +3,14 @@
 git clone https://github.com/sergiocazzolato/validator.git
 
 sudo apt update
-sudo apt install -y ubuntu-image awscli snapcraft
+sudo apt install -y ubuntu-image awscli snapcraft python3-pip
+sudo pip3 install psutil
 
-# run -> aws configure
-# run -> snapcraft login
+# sudo aws configure
+sudo cp -rf /home/ubuntu/.aws /root/.aws
+# sudo snapcraft login
+sudo mkdir -p /root/.config
+sudo cp -rf /home/ubuntu/.config/snapcraft /root/.config
 
 cd validator/images
 sudo cp image-generator.service /etc/systemd/system/
@@ -14,4 +18,5 @@ sudo cp image-generator.timer /etc/systemd/system/
 sudo systemctl daemon-reload
 
 sudo systemctl enable image-generator.timer image-generator.service
+sudo systemctl start image-generator.timer
 
