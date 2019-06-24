@@ -1,7 +1,5 @@
 #!/bin/bash
 
-git clone https://github.com/sergiocazzolato/validator.git
-
 sudo apt update
 sudo apt install -y ubuntu-image awscli snapcraft python3-pip
 sudo pip3 install psutil
