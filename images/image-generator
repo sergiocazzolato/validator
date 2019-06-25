@@ -259,6 +259,8 @@ This class represents an image with all its attributes and the including the tri
 which are used to update
 """
 class Image:
+    IMAGE_FILE = 'image.json'
+
     def __init__(self, definition, default_platform=None):
         self.version = definition.get('version')
         self.channel = definition.get('channel')
@@ -353,6 +355,16 @@ class Image:
 
         self.manifest = ImageManifest(manifest_path=manifest_path)
 
+    def save_image(self):
+        image_file = os.path.join(self.output_dir, self.IMAGE_FILE)
+
+        if os.path.exists(image_file):
+            return
+
+        logging.info('Saving to image info: {}'.format(image_file))
+        with open(image_file, 'w+') as json_file:
+            json.dump(self.__dict__(), json_file)
+
 
 """
 This class Creates, compress and synchronize the ubuntu core images
@@ -399,6 +411,7 @@ class ImageProcessor:
         subprocess.call(line, shell=True)
 
         self.image.read_manifest()
+        self.image.save_image()
 
 
     def sync_image(self):
@@ -485,6 +498,7 @@ class ImagesManager:
             image_db = self._get_image_from_db(image)
             if image_db and not self.is_new_image_needed(image_db):
                 logging.info('No image needed for image: {}'.format(image_db))
+                image_db.save_image()
                 created_images.append(image_db)
                 continue
 
