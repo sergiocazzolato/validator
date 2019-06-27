@@ -17,8 +17,10 @@ SUPPORTED_VERSIONS = [16, 18]
 IMAGE_EXT = '.img'
 COMPRESSION_EXT = '.img.xz'
 SEED_MANIFEST_FILE = 'seed.manifest'
-IMAGES_INFO_FILE = 'images.json'
-IMAGES_DB_FILE = 'images_db.json'
+IMAGE_SETS_FILE = 'image_sets.json'
+IMAGE_DB_FILE = 'image_db.json'
+IMAGES_TAG = 'images'
+METADATA_TAG = 'metadata'
 
 
 """
@@ -169,25 +171,15 @@ class ImageSet:
 
 
 """
-Read the images_info_file file and generate a dict based on its content
+Generates a list of images base of the image sets defined
 This file contains the information needed to generate the images and publish them
 """
 class ImageSetManager:
-  
-    def __init__(self, image_set_path):
-        if not os.path.exists(image_set_path):
-            raise ValueError('Images file does not exist at: '.format(image_set_path))
-    
-        with open(image_set_path) as json_file:  
-            data = json.load(json_file)
-            
-            if not 'supported_images' in data.keys():
-                raise RuntimeError('Incorrect format found on file: {}'.format(image_set_path))
 
-            self.images_sets = []
-            for image_set_definition in data.get('supported_images'):
-                self.images_sets.append(ImageSet(image_set_definition))
-
+    def __init__(self, images_sets):
+        self.images_sets = []
+        for image_set_definition in images_sets:
+            self.images_sets.append(ImageSet(image_set_definition))
 
     def get_all_images(self):
         all_images = []
@@ -413,6 +405,13 @@ class ImageProcessor:
         self.image.read_manifest()
         self.image.save_image()
 
+    def delete_image(self):
+        # Clean the output dir
+        if not os.path.isdir(self.image.output_dir):
+            raise RuntimeError('Output dir does not exist')
+
+        image_path = self.image.get_image_already_created()
+        os.path.remove(image_path)
 
     def sync_image(self):
         dirname = os.path.basename(self.image.output_dir)
@@ -440,7 +439,14 @@ class ImageProcessor:
     def process_image(self):
         self.create_image()
         self.compress_image()
-        self.sync_image()       
+        self.sync_image()
+
+        return self.image
+
+    def process_metadata(self):
+        self.create_image()
+        self.delete_image()
+        self.sync_image()
 
         return self.image
 
@@ -449,19 +455,10 @@ class ImageProcessor:
 This class creates a list of images
 """
 class ImagesManager:
-    def __init__(self, image_db_path):
-        self.image_db_path = image_db_path
+    def __init__(self, images_db_data):
         self.images_db_data = []
-
-        if os.path.exists(self.image_db_path):           
-            self._read_image_db_file()
-
-    def _read_image_db_file(self):
-        with open(self.image_db_path) as json_file:
-            image_list = json.load(json_file)
-            for image in image_list:                
-                self.images_db_data.append(Image(image))
-
+        for image in images_db_data:
+            self.images_db_data.append(Image(image))
 
     def _get_image_from_db(self, image):
         for image_db in self.images_db_data:
@@ -490,7 +487,7 @@ class ImagesManager:
 
         return False
 
-    def create_images(self, images):
+    def _create(self, images, is_metadata=False):
         created_images = []
         for image in images:
             logging.info('Starting with image: {}'.format(image))
@@ -503,55 +500,130 @@ class ImagesManager:
                 continue
 
             processor = ImageProcessor(image)
-            image_new = processor.process_image()
+            if is_metadata:
+                image_new = processor.process_metadata()
+            else:
+                image_new = processor.process_image()
+
             if image_new:
-                logging.info('Image {} created and synchronized successfully'.format(image_new))
+                logging.info('Image {} processed successfully'.format(image_new))
                 created_images.append(image_new)
             else:
-                logging.error('Image {} could not be creater or synchronized correctly'.format(image))
+                logging.error('Image {} could not be processed correctly'.format(image))
 
         return created_images
 
-    def write_images_db(self, images):
-        logging.info('Saving to images db: {}'.format(images))
+    def create_images(self, images):
+        return self._create(images, is_metadata=False)
 
-        images_dict = []
-        for image in images:
-            images_dict.append(image.__dict__())
-
-        with open(self.image_db_path, 'w') as json_file:
-            json.dump(images_dict, json_file)
+    def create_metadata(self, images):
+        return self._create(images, is_metadata=True)
 
 
-def is_image_generator_already_running():
-    count = 0
-    for proc in psutil.process_iter():
-        try:
-            pinfo = proc.as_dict(attrs=['pid', 'name', 'cmdline'])
-            if 'python3' == pinfo.get('name') and './image-generator' in pinfo.get('cmdline'):
-                count = count + 1
-        except psutil.NoSuchProcess:
-            return False
+class ImageFiles:
+    
+    @staticmethod
+    def write_db(images, metadata):
+        full_dict = {
+            ImageFiles.IMAGES_TAG: images, 
+            ImageFiles.METADATA_TAG: metadata
+        }
+        if not images:
+            logging.warning('No images to update in db')
+        if not metadata:
+            logging.warning('No metadata to update in db')
 
-    return count > 1
+        logging.info('Saving to images and metadata to db: {}'.format(full_dict))    
+        with open(IMAGE_DB_FILE, 'w') as json_file:
+            json.dump(full_dict, json_file)
+
+    @staticmethod
+    def read_images_db():
+        images_db = ImageFiles._read_db(IMAGES_TAG)
+        if not images_db:
+            return []
+        return images_db
+
+    @staticmethod
+    def read_metadata_db():
+        metadata_db = ImageFiles._read_db(METADATA_TAG)
+        if not metadata_db:
+            return []
+        return metadata_db
+
+    @staticmethod
+    def read_images_set():
+        return ImageFiles._read_sets(IMAGES_TAG)
+
+    @staticmethod
+    def read_metadata_set():
+        return ImageFiles._read_sets(METADATA_TAG)
+
+    @staticmethod
+    def _read_sets(tag):
+        if not os.path.exists(IMAGE_SETS_FILE):
+            raise RuntimeError('Sets file not found: {}'.format(IMAGE_SETS_FILE))
+
+        with open(IMAGE_SETS_FILE) as json_file:  
+            data = json.load(json_file)
+            
+            if not tag in data.keys():
+                raise RuntimeError('Tag {} not found on file: {}'.format(tag, IMAGE_SETS_FILE))
+
+            return data.get(tag)
+
+    @staticmethod
+    def _read_db(tag):
+        if not os.path.exists(IMAGE_DB_FILE):
+            return
+
+        with open(IMAGE_DB_FILE) as json_file:  
+            data = json.load(json_file)
+            if not tag in data.keys():
+                raise RuntimeError('Tag {} not found on file: {}'.format(tag, IMAGE_DB_FILE))
+
+            return data.get(tag)
+
+
+class ProcessManager:
+
+    @staticmethod
+    def is_image_generator_already_running():
+        count = 0
+        for proc in psutil.process_iter():
+            try:
+                pinfo = proc.as_dict(attrs=['pid', 'name', 'cmdline'])
+                if 'python3' == pinfo.get('name') and './image-generator' in pinfo.get('cmdline'):
+                    count = count + 1
+            except psutil.NoSuchProcess:
+                return False
+
+        return count > 1
 
 
 def main():
-    images_sets_manager = ImageSetManager(IMAGES_INFO_FILE)
+    images_sets_manager = ImageSetManager(ImageFiles.read_images_set())
+    images_manager = ImagesManager(ImageFiles.read_images_db())
+
+    metadata_sets_manager = ImageSetManager(ImageFiles.read_metadata_set())
+    metadata_manager = ImagesManager(ImageFiles.read_metadata_db())
+
+    # Create the images and update their metadata
     all_images = images_sets_manager.get_all_images()
-
-    images_manager = ImagesManager(IMAGES_DB_FILE)
     used_images = images_manager.create_images(all_images)
-    images_manager.write_images_db(used_images)
 
-    if not used_images:
-        logging.warning('No images description to update')
+    # Update just the metadata for images which don't require image file
+    all_metadata = metadata_sets_manager.get_all_images()
+    used_metadata = metadata_manager.create_metadata(all_metadata)
+
+    # Save all the metadata to db
+    ImageFiles.write_db(used_images, used_metadata)    
 
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(levelname)s - %(message)s', level=logging.INFO)
 
-    if is_image_generator_already_running():
+    if ProcessManager.is_image_generator_already_running():
         logging.warning('Image generator already being executed, skipping...')
     
     main()

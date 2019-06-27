@@ -1,5 +1,85 @@
 {
-   "supported_images":[
+   "metadata":[
+      {
+         "version":16,
+         "channel":"beta",
+         "snaps":"",
+         "platforms":[
+            "pc-amd64",
+            "pc-i386"
+         ],
+         "triggers":[
+            {
+               "snap":{
+                  "name":"core",
+                  "channel":"beta"
+               }
+            }
+         ]  
+      },
+      {
+         "version":16,
+         "channel":"stable",
+         "snaps":[
+            {
+               "name":"core",
+               "channel":"beta"
+            }
+         ],
+         "platforms":[
+            "pc-amd64",
+            "pc-i386"
+         ],
+         "triggers":[
+            {
+               "snap":{
+                  "name":"core",
+                  "channel":"beta"
+               }
+            }
+         ]
+      },
+      {
+         "version":18,
+         "channel":"beta",
+         "snaps":"",
+         "platforms":[
+            "pc-amd64",
+            "pc-i386"
+         ],
+         "triggers":[
+            {
+               "snap":{
+                  "name":"snapd",
+                  "channel":"beta"
+               }
+            }
+         ]
+      },
+      {
+         "version":18,
+         "channel":"stable",
+         "snaps":[
+            {
+               "name":"snapd",
+               "channel":"beta"
+            }
+         ],
+         "platforms":[
+            "pc-amd64",
+            "pc-i386"
+         ],
+         "triggers":[
+            {
+               "snap":{
+                  "name":"snapd",
+                  "channel":"beta"
+               }
+            }
+         ]
+      }
+   ],
+   "images":[
       {
          "version":16,
          "channel":"beta",
@@ -16,7 +96,7 @@
                   "channel":"beta"
                }
             }
-         ]
+         ]  
       },
       {
          "version":16,
