@@ -525,9 +525,18 @@ class ImageFiles:
     
     @staticmethod
     def write_db(images, metadata):
+
+        images_dict = []
+        for image in images:
+            images_dict.append(image.__dict__())
+
+        metadata_dict = []
+        for image in metadata:
+            metadata_dict.append(image.__dict__())
+
         full_dict = {
-            IMAGES_TAG: images,
-            METADATA_TAG: metadata
+            IMAGES_TAG: images_dict,
+            METADATA_TAG: metadata_dict
         }
         if not images:
             logging.warning('No images to update in db')
