@@ -411,7 +411,8 @@ class ImageProcessor:
             raise RuntimeError('Output dir does not exist')
 
         image_path = self.image.get_image_already_created()
-        os.path.remove(image_path)
+        logging.info('Removing image: {}'.format(image_path))
+        os.remove(image_path)
 
     def sync_image(self):
         dirname = os.path.basename(self.image.output_dir)
@@ -525,8 +526,8 @@ class ImageFiles:
     @staticmethod
     def write_db(images, metadata):
         full_dict = {
-            ImageFiles.IMAGES_TAG: images, 
-            ImageFiles.METADATA_TAG: metadata
+            IMAGES_TAG: images,
+            METADATA_TAG: metadata
         }
         if not images:
             logging.warning('No images to update in db')
