@@ -1,23 +1,22 @@
 type: model
-authority-id: canonical
+authority-id: BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz
 series: 16
-brand-id: canonical
-model: ubuntu-core-18-i386
+brand-id: BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz
+model: pc
 architecture: i386
 base: core18
-display-name: Ubuntu Core 18 (i386)
 gadget: pc=18
 kernel: pc-kernel=18
-timestamp: 2018-08-13T09:00:00+00:00
-sign-key-sha3-384: 9tydnLa6MTJ-jaQTFUXEwHl1yRx7ZS4K5cyFDhYDcPzhS7uyEkDxdUjg9g08BtNn
+timestamp: 2019-05-16T18:06:04+00:00
+sign-key-sha3-384: 0u-IKZyVlTxwiBVOv7oT1FNKdfkKJyOSwbEWJPurlvtaGZxX6VrMHSESnIPeaNMC
 
-AcLBXAQAAQoABgUCW37NFwAKCRDgT5vottzAEorPD/9mee1wQH5IgvOH3nhrZKsWbkSO/4ndc8P2
-mKdbhviF5JvxaouePH8UdC6bCswFXuX/r+YbXZ5wgZq3IwgK76biNVn6lYtUUcFErou0dobZGEeR
-cA8BTOhjer4/Dc/gD3xPe4XZ27XPWWnHqEa3eb/Vir4goZcw2MPHRwK4ZVBXMgDmsHeTecwwu3gq
-mySWd8Jja9f1MDm00kOV+bkXAVuCdaCWvtbh7gK4s7OS+kV27ItXSK9Z4DzSyi2+XjkzI5FceflE
-AxC1OYpg4DY8OSx+0pG4RLuA00ztEnmkWm4jhZgslVWsz//bcrSN2egRkrl2W/gOIyHgskTGQCNQ
-5PpASzhe9dhsdZKiddX+cokO2E5p2XNw+QdSYhEKf+wsmltQSKGkvjEJ2qUGt5PueKEbBizm0n7z
-TAXH/VbnGUuj002cWL8UUfcKQhv+zjmn/D+aEpv2sOmBBwjzqWezNRPu+NLmB/kYERg4+j7kMS+R
-Lgi5smwarManqOHzEe06hQ0SIbyDa4276P2n8zTTUptqOt0RQqO4ECEsyNZyWeJGcFOGehUGG1wO
-V80W0zrzn+bCcZuFtMD668uWthAaLaeW/eIF24QvzYIgSNa3/6lxELRHhelkqUUcOBluiPj7uKCA
-wb0UvD66TKCoXq/TOIzC48eBi0Ro6obROLtK/oX/+w==
+AcLBcwQAAQoAHRYhBMWWVcwwFvQaEaz9YITG74Zv2rilBQJdFodNAAoJEITG74Zv2rilQ3QQAKpU
+j0QNX7XknyL+x4CCjpGrzStP78pVOM7vNSQ2Web0VzHN0i553H0itMD0dRHLgDPWLXFxLUvjvDTV
+e8SAWiQ7YT/LMhUVjZjQcahSHMUAHNws/hxeJ0UGqdyhcgSaWFk31gz+uDzqFnfS5Hr7KLGAMDcK
+tyqkbKvTI9t9M670MdyzHs1WGQ0dgtBtN0P1AvkHRtgsl+sshRvD22CWMIGt7bp8mv9IWSuZjvu/
+dutn99W8g+X24H8WAiwCrkbVjlvJ30ENei7oKYWMyPJhkb04eXgDn1U33AlzHs5JBD53uIylGMzf
+C/xAOHon/Jlt/SxykmtRltAN1EG75ImvP0fTEYeyYPqKEfe2lKuPtYZj/J4xrTN4XJ1lacNgb1ro
+YD/CPMIFEtSpVU6mwEVzPYBiaBhWZRpWva0/ACsnjEWeyTykbZyrHn5USHN62nPwQCs8AkMkAcw5
+GazjTx7l+WOWj0iwOns+t+Yp4/eU82eSqp40nnAEzlCsOnARh8T917mzjjjcHmCb9jO6Gf0kGvBC
+i1mo25rv/fyj6NhtNY2Q6CeDLW2qHZ4/RiZ6+XyY2t7c6bvDj+Y6VJPIvJRTODLMX9afN+hUFRUG
++o21RGdErJZoV+g/HV3ElfUTXipFXC5rchL9KB3MhA6gUSe8OieVAvcKNByN6h2EOqDm7zES

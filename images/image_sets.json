@@ -2,23 +2,6 @@
    "metadata":[
       {
          "version":16,
-         "channel":"beta",
-         "snaps":"",
-         "platforms":[
-            "pc-amd64",
-            "pc-i386"
-         ],
-         "triggers":[
-            {
-               "snap":{
-                  "name":"core",
-                  "channel":"beta"
-               }
-            }
-         ]  
-      },
-      {
-         "version":16,
          "channel":"stable",
          "snaps":[
             {
@@ -34,23 +17,6 @@
             {
                "snap":{
                   "name":"core",
-                  "channel":"beta"
-               }
-            }
-         ]
-      },
-      {
-         "version":18,
-         "channel":"beta",
-         "snaps":"",
-         "platforms":[
-            "pc-amd64",
-            "pc-i386"
-         ],
-         "triggers":[
-            {
-               "snap":{
-                  "name":"snapd",
                   "channel":"beta"
                }
             }
@@ -87,7 +53,9 @@
          "platforms":[
             "pi2",
             "pi3",
-            "dragonboard"
+            "dragonboard",
+            "pc-amd64",
+            "pc-i386"
          ],
          "triggers":[
             {
@@ -128,7 +96,9 @@
          "platforms":[
             "pi2",
             "pi3",
-            "dragonboard"
+            "dragonboard",
+            "pc-amd64",
+            "pc-i386"
          ],
          "triggers":[
             {
