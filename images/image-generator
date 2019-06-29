@@ -471,6 +471,9 @@ class ImagesManager:
         if not manifest or manifest.empty():
             return True
 
+        if not image.get_image_already_created():
+            return True
+
         for trigger in image.triggers:
             trigger_snap = trigger.snap
 
@@ -525,7 +528,6 @@ class ImageFiles:
     
     @staticmethod
     def write_db(images, metadata):
-
         images_dict = []
         for image in images:
             images_dict.append(image.__dict__())
