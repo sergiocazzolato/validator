@@ -3,7 +3,7 @@
   "authority-id": "BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz",
   "brand-id": "BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz",
   "series": "16",
-  "model": "pc-i386",
+  "model": "pc",
   "architecture": "i386",
   "gadget": "pc",
   "kernel": "pc-kernel",
