@@ -1,6 +1,31 @@
 {
    "metadata":[
       {
+         "version":18,
+         "channel":"stable",
+         "snaps":[
+            {
+               "name":"core18",
+               "channel":"edge"
+            }
+         ],
+         "platforms":[
+            "pi2",
+            "pi3",
+            "dragonboard",
+            "pc-amd64",
+            "pc-i386"
+         ],
+         "triggers":[
+            {
+               "snap":{
+                  "name":"core18",
+                  "channel":"edge"
+               }
+            }
+         ]
+      },
+      {
          "version":16,
          "channel":"stable",
          "snaps":[
@@ -64,7 +89,7 @@
                   "channel":"beta"
                }
             }
-         ]  
+         ]
       },
       {
          "version":16,
