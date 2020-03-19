@@ -50,7 +50,7 @@ This represents a snap with a name and channel from which provides
 class Snap:
  
     def __init__(self, definition, default_channel=None):
-        
+
         self.name = definition.get('name')
         self.channel = definition.get('channel', default_channel)
 
