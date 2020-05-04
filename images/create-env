@@ -6,8 +6,11 @@ sudo apt update
 sudo apt install -y ubuntu-image awscli snapcraft python3-pip
 sudo pip3 install psutil
 
-# sudo aws configure
-sudo cp -rf /home/ubuntu/.aws /root/.aws
+# sudo su
+# gcloud auth application-default login
+# gcloud auth login
+# exit
+
 # sudo snapcraft login
 sudo mkdir -p /root/.config
 sudo cp -rf /home/ubuntu/.config/snapcraft /root/.config
