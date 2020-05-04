@@ -9,7 +9,7 @@ import shutil
 import subprocess
 import time
 
-S3_BUCKET_NAME = 's3://cachio/images'
+S3_BUCKET_NAME = 'gs://spread-snapd-tests/images'
 SUPPORTED_PLATFORMS = ['dragonboard','pc-amd64','pc-i386','pi3','pi2']
 SUPPORTED_CHANNELS = ['edge', 'beta', 'candidate', 'stable']
 SUPPORTED_VERSIONS = [16, 18]
@@ -416,7 +416,7 @@ class ImageProcessor:
 
     def sync_image(self):
         dirname = os.path.basename(self.image.output_dir)
-        line = 'aws s3 sync --acl public-read {} {}/{}'.format(self.image.output_dir, S3_BUCKET_NAME, dirname)
+        line = 'gsutil rsync {} {}/{}'.format(self.image.output_dir, S3_BUCKET_NAME, dirname)
         logging.info('Running command line: {}'.format(line))
         subprocess.call(line, shell=True)
 
