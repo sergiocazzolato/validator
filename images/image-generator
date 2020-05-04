@@ -416,7 +416,7 @@ class ImageProcessor:
 
     def sync_image(self):
         dirname = os.path.basename(self.image.output_dir)
-        line = 'gsutil rsync -d -r {} {}/{}'.format(self.image.output_dir, S3_BUCKET_NAME, dirname)
+        line = 'gsutil -o GSUtil:parallel_composite_upload_threshold=2000M rsync -d -r {} {}/{}'.format(self.image.output_dir, S3_BUCKET_NAME, dirname)
         logging.info('Running command line: {}'.format(line))
         subprocess.call(line, shell=True)
 
