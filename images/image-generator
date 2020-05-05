@@ -472,9 +472,6 @@ class ImagesManager:
         if not manifest or manifest.empty():
             return True
 
-        if not image.get_image_already_created():
-            return True
-
         for trigger in image.triggers:
             trigger_snap = trigger.snap
 
