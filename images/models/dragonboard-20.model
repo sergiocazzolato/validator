@@ -1,0 +1,42 @@
+type: model
+authority-id: BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz
+series: 16
+brand-id: BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz
+model: dragonboard
+architecture: arm64
+base: core20
+grade: dangerous
+snaps:
+  -
+    default-channel: 20/edge
+    id: YbGa9O3dAXl88YLI6Y1bGG74pwBxZyKg
+    name: pi
+    type: gadget
+  -
+    default-channel: latest/edge
+    id: DLqre5XGLbDqg9jPtiAhRRjDuPVa5X1q
+    name: core20
+    type: base
+  -
+    default-channel: 20/edge
+    id: jeIuP6tfFrvAdic8DMWqHmoaoukAPNbJ
+    name: pi-kernel
+    type: kernel
+  -
+    default-channel: latest/edge
+    id: PMrrV4ml8uWuEUDBT8dSGnKUYbevVhc4
+    name: snapd
+    type: snapd
+timestamp: 2019-05-16T18:06:04+00:00
+sign-key-sha3-384: 0u-IKZyVlTxwiBVOv7oT1FNKdfkKJyOSwbEWJPurlvtaGZxX6VrMHSESnIPeaNMC
+
+AcLBcwQAAQoAHRYhBMWWVcwwFvQaEaz9YITG74Zv2rilBQJesbdKAAoJEITG74Zv2rilYsQP/0vD
+e2iZ4dQqBGdfwWTD8l0EGGhBmkeP4VkPsFVBI2cxz5fSo54MK7hIll5aVgWHOi2VJo93EwyThhQz
+UCcib2Xn0Q0eCFn7444KrdzzPj50XpfWgINWjtRHHnjjcQvR0eGvLSVVIHx6wfGSfBNfkrB2595U
+K205nv56QAxFWwb50Rwpc3h6ltKVYPnEx4Z9VLvh3yQHAOUGMklGdTdm9icRlE2GcidAxmAshaqI
+dAsVNqzaGFEDe87vUwsJC4koirZUQO5/VXYmGN/zsjJFqh9fsba6ASMN2fyWjXun+e4m6h7l1PMe
+/G0C00O9OJ/wiK2FLxutjxxI4QDBARZeveGZY8oJlMFr33DB81IBm1wWT/W+xVEvaL+JhPmldniW
+f9v8RuocBE/o7PwtHjmHh12+Ysz6XtyIZTbkb1LeNFka3z01CZjDAmYFW+X39pLfrbV3fpOxwcup
+xNHxj4bbxG82ZJmufPJ36wihR1gzZYIJ8Mnu7cM4GNn3SKd8fyj2NfJWl2Wg/QXH1FvhC8GW88zF
+tDRXRJnWzwVxg/Mxa/vO/y8QS5yDPbVN1P89BhJAFgxOInToZLPOOOorH79HSgEXuII53P3LJHHN
+ckUy+/QEK5DtxZlanBygmoC2GkKUSHEh5+12XuebVEF6Cri6SxCppLHRiM+o+P+uuIg9YL9r

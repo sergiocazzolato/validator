@@ -1,0 +1,17 @@
+{
+    "type": "model",
+    "authority-id": "BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz",
+    "series": "16",
+    "brand-id": "BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz",
+    "model": "dragonboard",
+    "architecture": "arm64",
+    "base": "core20",
+    "grade": "dangerous",
+    "timestamp": "2019-05-16T18:06:04+00:00",
+    "snaps": [
+        {"default-channel": "20/edge", "id": "YbGa9O3dAXl88YLI6Y1bGG74pwBxZyKg", "name": "pi", "type": "gadget"},
+        {"default-channel": "latest/edge", "id": "DLqre5XGLbDqg9jPtiAhRRjDuPVa5X1q", "name": "core20", "type": "base"},
+        {"default-channel": "20/edge", "id": "jeIuP6tfFrvAdic8DMWqHmoaoukAPNbJ", "name": "pi-kernel", "type": "kernel"},
+        {"default-channel": "latest/edge", "id": "PMrrV4ml8uWuEUDBT8dSGnKUYbevVhc4", "name": "snapd", "type": "snapd"}
+    ]
+}
