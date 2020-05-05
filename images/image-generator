@@ -441,6 +441,7 @@ class ImageProcessor:
         self.create_image()
         self.compress_image()
         self.sync_image()
+        self.delete_image()
 
         return self.image
 
