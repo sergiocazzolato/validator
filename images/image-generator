@@ -467,9 +467,12 @@ class ImagesManager:
             if image_db.match(image):
                 return image_db
 
-    def is_new_image_needed(self, image):        
+    def is_new_image_needed(self, image):
+        logging.info('Checking if new image is needed')
+
         manifest = image.manifest
         if not manifest or manifest.empty():
+            logging.info('Manifest empty, new image is needed')
             return True
 
         for trigger in image.triggers:
@@ -487,6 +490,7 @@ class ImagesManager:
                     trigger_snap, snap_revision_store, snap_revision_manifest))
                 return True
 
+        logging.info('New image is not needed')
         return False
 
     def _create(self, images, is_metadata=False):
@@ -502,10 +506,14 @@ class ImagesManager:
                 continue
 
             processor = ImageProcessor(image)
-            if is_metadata:
-                image_new = processor.process_metadata()
-            else:
-                image_new = processor.process_image()
+            try:
+                if is_metadata:
+                    image_new = processor.process_metadata()
+                else:
+                    image_new = processor.process_image()
+            except Exception:
+                logging.error('Image {} could not be processed correctly'.format(image))
+                continue
 
             if image_new:
                 logging.info('Image {} processed successfully'.format(image_new))
