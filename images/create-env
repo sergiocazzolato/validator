@@ -3,8 +3,9 @@
 git clone https://github.com/sergiocazzolato/validator.git
 
 sudo apt update
-sudo apt install -y ubuntu-image awscli snapcraft python3-pip
+sudo apt install -y awscli snapcraft python3-pip
 sudo pip3 install psutil
+sudo snap install ubuntu-image --classic
 
 # sudo su
 # snapcraft login
