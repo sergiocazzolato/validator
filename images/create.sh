@@ -9,7 +9,11 @@ PLATFORMS=${4:-"dragonboard pc-amd64 pc-i386 pi3 pi2"}
 for platform in $PLATFORMS; do
     image_option=""
     if [[ "$platform" == pc* ]]; then
-        image_option="--image-size 3G"
+        if [[ "$VERSION" == 2* ]]; then
+            image_option="--image-size 8G"
+        else
+            image_option="--image-size 3G"
+        fi
     fi
 
     snaps=""

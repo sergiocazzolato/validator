@@ -172,6 +172,7 @@
          ],
          "platforms":[
             "pi3",
+            "pi4",
             "pc-amd64"
          ],
          "triggers":[
@@ -194,7 +195,7 @@
          ],
          "platforms":[
             "pi3",
-            "dragonboard",
+            "pi4",
             "pc-amd64"
          ],
          "triggers":[
@@ -202,6 +203,24 @@
                "snap":{
                   "name":"snapd",
                   "channel":"edge"
+               }
+            }
+         ]
+      },
+      {
+         "version":20,
+         "channel":"beta",
+         "snaps":"",
+         "platforms":[
+            "pi3",
+            "pi4",
+            "pc-amd64"
+         ],
+         "triggers":[
+            {
+               "snap":{
+                  "name":"snapd",
+                  "channel":"beta"
                }
             }
          ]

@@ -10,7 +10,7 @@ import subprocess
 import time
 
 S3_BUCKET_NAME = 'gs://spread-snapd-tests/images'
-SUPPORTED_PLATFORMS = ['dragonboard','pc-amd64','pc-i386','pi3','pi2']
+SUPPORTED_PLATFORMS = ['dragonboard','pc-amd64','pc-i386','pi4','pi3','pi2']
 SUPPORTED_CHANNELS = ['edge', 'beta', 'candidate', 'stable']
 SUPPORTED_VERSIONS = [16, 18, 20]
 
@@ -29,10 +29,11 @@ This represents an architecture used for images and snaps
 class Architecture:
 
     PLATFORM_ARCH_MAP = {
-        'pi2': 'armhf', 
-        'pi3': 'armhf', 
-        'dragonboard': 'arm64', 
-        'pc-i386': 'i386', 
+        'pi2': 'armhf',
+        'pi3': 'armhf',
+        'pi4': 'arm64',
+        'dragonboard': 'arm64',
+        'pc-i386': 'i386',
         'pc-amd64': 'amd64'
     }
 
@@ -374,6 +375,8 @@ class ImageProcessor:
         return sorted(snap_list)
 
     def get_image_options(self):
+        if self.image.version >= 20:
+            return '--image-size 8G'
         if self.image.platform.startswith('pc'):
             return '--image-size 3G'
         return ''
