@@ -1,0 +1,42 @@
+type: model
+authority-id: BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz
+series: 16
+brand-id: BhgbYoDtThegqVkEU7oiZP8GQwCoUIxz
+model: pi4
+architecture: arm64
+base: core20
+grade: dangerous
+snaps:
+  -
+    default-channel: 20/edge
+    id: YbGa9O3dAXl88YLI6Y1bGG74pwBxZyKg
+    name: pi
+    type: gadget
+  -
+    default-channel: latest/edge
+    id: DLqre5XGLbDqg9jPtiAhRRjDuPVa5X1q
+    name: core20
+    type: base
+  -
+    default-channel: 20/edge
+    id: jeIuP6tfFrvAdic8DMWqHmoaoukAPNbJ
+    name: pi-kernel
+    type: kernel
+  -
+    default-channel: latest/edge
+    id: PMrrV4ml8uWuEUDBT8dSGnKUYbevVhc4
+    name: snapd
+    type: snapd
+timestamp: 2019-05-16T18:06:04+00:00
+sign-key-sha3-384: 0u-IKZyVlTxwiBVOv7oT1FNKdfkKJyOSwbEWJPurlvtaGZxX6VrMHSESnIPeaNMC
+
+AcLBcwQAAQoAHRYhBMWWVcwwFvQaEaz9YITG74Zv2rilBQJe35hxAAoJEITG74Zv2rilhbYP/3uv
+f2ePCfIH/qDqYkeHl51KVQsl9ss180wvRtb7O3qpettZklSy3G4jEF7xxrAHDlHq5i8nX3QKBbQB
+crKE9QaZECKhuMKSKfsqq3TnhZ1DW2UhUmPmHVV4FZI6Zdf7B1ghQNNMCIDrlj4zt05kvcW6T7JX
+9ggsMLRDIBnSQF6RxNK3AdYrdECpaoTZbrk5U2oXdF4fXl/nTi01zdeHp8rMCzkyLEki5/1qCaki
+xFGoqxHiAjDGkWrMdFKYlxcnyBVxF3e4AF5KtHinwBVko7RSk9WDA+feRTp0SM4bfOsvI5azg2rA
+KJTx6pnWM2F0Bli0Vfi6GKlr+kU9t1I3EY7ba985gwjTkyke8vTpscAbZfkZWCS49Ym6Tdc4C5kd
+2KOH3HGIDCiYAQRqZ11ICMW4NGANTXPIXwEOEaAKKZy474DtJFF8JGToGPtPX1//hwN8Q08HUPq/
+DMRRssqqy2bXPembZASX53GHyK9Y4ie3dpc49t0FfwZpOgJ7xrJuwepeezWr7dhEgReKKWADYvad
+mr3fj49Z1hVEtWYDxEvhIrO8xk/FhF6ezAfWrmhoGni7XkhSXxdLNCW2SHdX+x4GSk65/p3z+2Ku
+Rl6x0dZCVvloECZnU8I+40WXEcDd8l8w+RWjNJDdjHDKr0GPpLQ6zt2JaUAFOq739PCZiUm8
