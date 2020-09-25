@@ -96,7 +96,7 @@ class Snap:
 
         revision = lines[0].split(' ')[-1]
         if Snap.check_name_and_revision(self.name, revision):
-            return revision
+            return int(revision)
 
         raise RuntimeError('Invalid revision: {} for snap: {}'.format(revision, self.name))
 
@@ -238,7 +238,12 @@ class ImageManifest:
                         logging.warning('Manifest incorrect snap: {} and revision: {}'.format(snap, revision))
 
     def get_snap_revision(self, snap):
-        return self.manifest.get(snap.name)
+        revision = self.manifest.get(snap.name)
+        try:
+            return int(revision)
+        except ValueError:
+            logging.error('Revision value is not integer: {}'.format(revision))
+            return
 
     def get_snap_names(self):
         return self.manifest.keys()
