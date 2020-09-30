@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import psutil
+import requests
 import shutil
 import subprocess
 import time
@@ -79,6 +80,10 @@ class Snap:
             valid = False
             logging.error('Revision value is not integer: {}'.format(revision))
 
+        if not revision:
+            valid = False
+            logging.error('Revision not valid: {}'.format(revision))
+
         if not name:
             valid = False
             logging.error('Name not valid: {}'.format(name))
@@ -86,15 +91,16 @@ class Snap:
         return valid
 
     def find_revision(self, arch):
-        line = "snapcraft status {} --arch {} | grep ' {} '".format(self.name, arch, self.channel)
-        logging.info('Running command line: {}'.format(line))
-        
-        lines = subprocess.check_output(line, shell=True, encoding='utf8').splitlines()
-        if not len(lines) == 1:
-            logging.error('Incorrect output format for snapcraft status command: {}'.format(lines))
-            return
+        logging.info('Requesting revision for snap: {}, channel: {} and arch: {}'.format(self.name, self.channel, arch))
+        response = requests.get('https://search.apps.ubuntu.com/api/v1/snaps/details/{}?channel={}}'.format(self.name, self.channel), 
+            headers={'X-Ubuntu-Series': '16', 'X-Ubuntu-Architecture': '{}'.format(arch)})
 
-        revision = lines[0].split(' ')[-1]
+        if not response.ok:
+            logging.error('Failed to get snap revision with status code: {}, raeson: {}'.format(response.status_code, response.reason))
+            logging.error('Response details: {}'.format(response.text))
+            raise RuntimeError('Error requesting the snap revision: {}'.format(response.text))
+
+        revision = response.json().get('revision')
         if Snap.check_name_and_revision(self.name, revision):
             return int(revision)
 
