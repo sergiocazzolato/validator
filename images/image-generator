@@ -92,7 +92,7 @@ class Snap:
 
     def find_revision(self, arch):
         logging.info('Requesting revision for snap: {}, channel: {} and arch: {}'.format(self.name, self.channel, arch))
-        response = requests.get('https://search.apps.ubuntu.com/api/v1/snaps/details/{}?channel={}}'.format(self.name, self.channel), 
+        response = requests.get('https://search.apps.ubuntu.com/api/v1/snaps/details/{}?channel={}'.format(self.name, self.channel),
             headers={'X-Ubuntu-Series': '16', 'X-Ubuntu-Architecture': '{}'.format(arch)})
 
         if not response.ok:
