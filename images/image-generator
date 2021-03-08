@@ -101,6 +101,7 @@ class Snap:
             raise RuntimeError('Error requesting the snap revision: {}'.format(response.text))
 
         revision = response.json().get('revision')
+        logging.info('Revision requested for snap: {}, channel: {} and arch: {} is: {}'.format(self.name, self.channel, arch, revision))
         if Snap.check_name_and_revision(self.name, revision):
             return int(revision)
 
@@ -499,6 +500,7 @@ class ImagesManager:
                 return True
             
             snap_revision_manifest = manifest.get_snap_revision(trigger_snap)
+            logging.info('Revision for snap: {}, obtained from manifest: {}'.format(trigger_snap, snap_revision_manifest))
             if not snap_revision_manifest or snap_revision_store > snap_revision_manifest:
                 logging.info('Revision for snap {} on store is higher {} than in manifest {}'.format(
                     trigger_snap, snap_revision_store, snap_revision_manifest))
