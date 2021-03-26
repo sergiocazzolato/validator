@@ -629,9 +629,10 @@ class ProcessManager:
         for proc in psutil.process_iter():
             try:
                 pinfo = proc.as_dict(attrs=['pid', 'name', 'cmdline'])
-                current_path = pathlib.Path(__file__).parent.absolute()
-                if 'python3' == pinfo.get('name') and current_path in pinfo.get('cmdline'):
-                    count = count + 1
+                if 'python3' == pinfo.get('name'):
+                    for line in pinfo.get('cmdline'):
+                        if line.endswith('/image-generator'):
+                            count = count + 1
             except psutil.NoSuchProcess:
                 return False
 
