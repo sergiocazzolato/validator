@@ -348,6 +348,8 @@ class Image:
             ( self.manifest == other.manifest or self.manifest.empty or other.manifest.empty ) and \
             set(self.snaps) == set(other.snaps)
 
+    def is_image_dir_created(self):
+        return os.path.isdir(self.output_dir)        
 
     def get_image_already_created(self):
         if os.path.isdir(self.output_dir):
@@ -517,7 +519,7 @@ class ImagesManager:
             logging.info('Starting with image: {}'.format(image))
 
             image_db = self._get_image_from_db(image)
-            if image_db and not self.is_new_image_needed(image_db):
+            if image_db and image_db.is_image_dir_created() and not self.is_new_image_needed(image_db):
                 logging.info('No image needed for image: {}'.format(image_db))
                 image_db.save_image()
                 created_images.append(image_db)
