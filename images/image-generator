@@ -555,7 +555,7 @@ class ImagesManager:
             if snap_revision_remote:
                 snap_revision = snap_revision_remote
                 logging.info('Revision for snap: {}, obtained from remote manifest: {}'.format(trigger_snap, snap_revision))
-            else
+            else:
                 snap_revision = manifest.get_snap_revision(trigger_snap)
                 logging.info('Revision for snap: {}, obtained from local manifest: {}'.format(trigger_snap, snap_revision))
 
