@@ -387,7 +387,7 @@ class Image:
             return self._find_in_output_dir()
 
     def get_remote_revision(self, snap):
-        if not self.remote_manifest
+        if not self.remote_manifest:
             try:
                 manifest_url = urlparse.urljoin(S3_PUBLIC_URL, self.get_image_name(), 'seed.manifest')
                 self.remote_manifest = ImageManifest(manifest_url=manifest_url)                
