@@ -12,7 +12,6 @@ import subprocess
 import sys
 import time
 import urllib.request
-import urlparse
 
 S3_BUCKET_NAME = 'gs://snapd-spread-tests/images'
 S3_PUBLIC_URL = 'https://storage.googleapis.com/snapd-spread-tests/images'
@@ -389,7 +388,7 @@ class Image:
     def get_remote_revision(self, snap):
         if not self.remote_manifest:
             try:
-                manifest_url = urlparse.urljoin(S3_PUBLIC_URL, self.get_image_name(), 'seed.manifest')
+                manifest_url = '{}/{}/{}'.format(S3_PUBLIC_URL, self.get_image_name(), 'seed.manifest')
                 self.remote_manifest = ImageManifest(manifest_url=manifest_url)                
             except:
                 return None
