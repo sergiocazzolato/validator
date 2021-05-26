@@ -11,8 +11,11 @@ import shutil
 import subprocess
 import sys
 import time
+import urllib.request
+import urlparse
 
 S3_BUCKET_NAME = 'gs://snapd-spread-tests/images'
+S3_PUBLIC_URL = 'https://storage.googleapis.com/snapd-spread-tests/images'
 SUPPORTED_PLATFORMS = ['dragonboard','pc-amd64','pc-i386','pi4','pi3','pi2']
 SUPPORTED_CHANNELS = ['edge', 'beta', 'candidate', 'stable']
 SUPPORTED_VERSIONS = [16, 18, 20]
@@ -203,14 +206,20 @@ class ImageSetManager:
 This class represents a manifest which contains the snaps and revisions for an image
 """
 class ImageManifest:
-    def __init__(self, manifest_path=None, definition=None):
+    def __init__(self, manifest_path=None, manifest_url=None, definition=None):
         self.manifest = {}
 
         if manifest_path:
             self._load_from_path(manifest_path)
+            return
+
+        if manifest_url:
+            self._load_from_url(manifest_url)
+            return
 
         if definition:
            self._load_from_definition(definition)
+           return
 
     def __repr__(self):
         return str(self.__dict__())
@@ -229,22 +238,39 @@ class ImageManifest:
     def _load_from_definition(self, definition):
         self.manifest = definition
 
+    def _load_manifest_part(self, line):
+        parts = line.split(' ')
+        if not len(parts) == 2:
+            logging.warning('Manifest incorrect line: {}'.format(parts))
+        else:
+            snap = parts[0].strip()
+            revision = parts[1].strip()
+            if Snap.check_name_and_revision(snap, revision):
+                self.manifest.update({snap: revision})
+            else:
+                logging.warning('Manifest incorrect snap: {} and revision: {}'.format(snap, revision))
+
+    def _load_from_url(self, manifest_url):        
+        try:
+            file = urllib.request.urlopen(manifest_url)
+        except HTTPError as err:
+            if err.code == 404:
+                logging.warning('The manifest url does not exist')
+                raise RuntimeError('The manifest url does not exist')
+            else:
+                raise 
+
+        for line in file:
+            self._load_manifest_part(line.decode('utf-8'))
+
     def _load_from_path(self, manifest_path):
         if not os.path.exists(manifest_path):
             raise ValueError('No manifest in path: {}'.format(manifest_path))
 
         with open(manifest_path, 'r') as file:
             for line in file.readlines():
-                parts = line.split(' ')
-                if not len(parts) == 2:
-                    logging.warning('Manifest incorrect line: {}'.format(parts))
-                else:
-                    snap = parts[0].strip()
-                    revision = parts[1].strip()
-                    if Snap.check_name_and_revision(snap, revision):
-                        self.manifest.update({snap: revision})
-                    else:
-                        logging.warning('Manifest incorrect snap: {} and revision: {}'.format(snap, revision))
+                self._load_manifest_part(line.decode('utf-8'))
+                
 
     def get_snap_revision(self, snap):
         revision = self.manifest.get(snap.name)
@@ -295,6 +321,7 @@ class Image:
             self.snaps.append(Snap(snap))
 
         self.output_dir = self._get_output_dir()
+        self.remote_manifest = None
 
     def __repr__(self):        
         return str(self.__dict__())
@@ -325,10 +352,14 @@ class Image:
             self.platform == other.platform and \
             set(self.snaps) == set(other.snaps)
 
-    def _get_output_dir(self):
-        output_dir = os.path.join('output', '{}-{}-{}'.format(self.platform, self.version, self.channel))
+    def get_image_name(self):
+        name = '{}-{}-{}'.format(self.platform, self.version, self.channel)
         for snap in self.snaps:
-            output_dir = '{}-{}_{}'.format(output_dir, snap.name, snap.channel)
+            name = '{}-{}_{}'.format(name, snap.name, snap.channel)
+        return name
+
+    def _get_output_dir(self):
+        output_dir = os.path.join('output', self.get_image_name())        
 
         logging.info('Output dir used: {}'.format(output_dir))
         return output_dir        
@@ -354,6 +385,16 @@ class Image:
     def get_image_already_created(self):
         if os.path.isdir(self.output_dir):
             return self._find_in_output_dir()
+
+    def get_remote_revision(self, snap):
+        if not self.remote_manifest
+            try:
+                manifest_url = urlparse.urljoin(S3_PUBLIC_URL, self.get_image_name(), 'seed.manifest')
+                self.remote_manifest = ImageManifest(manifest_url=manifest_url)                
+            except:
+                return None
+
+        return self.remote_manifest.get_snap_revision(snap)
 
     def read_manifest(self):
         manifest_dict = {}
@@ -499,15 +540,28 @@ class ImagesManager:
 
             try:
                 snap_revision_store = trigger_snap.find_revision(Architecture.from_platform(image.platform))
+                logging.info('Revision for snap: {}, obtained from Store: {}'.format(trigger_snap, snap_revision_store))
             except Exception:
                 logging.error('Failed to get snap revision from store for snap {}'.format(trigger_snap))
                 return True
+
+            snap_revision_remote = None
+            try:
+                snap_revision_remote = image.get_remote_revision(trigger_snap)
+            except Exception:
+                logging.warning('Snap revision could not be found in remote manifest')
             
-            snap_revision_manifest = manifest.get_snap_revision(trigger_snap)
-            logging.info('Revision for snap: {}, obtained from manifest: {}'.format(trigger_snap, snap_revision_manifest))
-            if not snap_revision_manifest or snap_revision_store > snap_revision_manifest:
+            # The revision uploaded to the bucket is the primary one, in case it cannot be retrieved, the local one is used
+            if snap_revision_remote:
+                snap_revision = snap_revision_remote
+                logging.info('Revision for snap: {}, obtained from remote manifest: {}'.format(trigger_snap, snap_revision))
+            else
+                snap_revision = manifest.get_snap_revision(trigger_snap)
+                logging.info('Revision for snap: {}, obtained from local manifest: {}'.format(trigger_snap, snap_revision))
+
+            if not snap_revision or snap_revision_store > snap_revision:
                 logging.info('Revision for snap {} on store is higher {} than in manifest {}'.format(
-                    trigger_snap, snap_revision_store, snap_revision_manifest))
+                    trigger_snap, snap_revision_store, snap_revision))
                 return True
 
         logging.info('New image is not needed')
