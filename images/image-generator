@@ -268,7 +268,7 @@ class ImageManifest:
 
         with open(manifest_path, 'r') as file:
             for line in file.readlines():
-                self._load_manifest_part(line.decode('utf-8'))
+                self._load_manifest_part(line)
                 
 
     def get_snap_revision(self, snap):
