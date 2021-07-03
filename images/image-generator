@@ -474,7 +474,7 @@ class ImageProcessor:
 
     def sync_image(self):
         dirname = os.path.basename(self.image.output_dir)
-        proxy = os.environment['HTTP_PROXY']
+        proxy = os.environ.get('HTTPS_PROXY','')
         gsutil_config='-o GSUtil:parallel_composite_upload_threshold=2000M'
         if proxy:
             gsutil_config = '{} -o Boto:proxy=squid.internal -o Boto:proxy_port=3128'.format(gsutil_config)
