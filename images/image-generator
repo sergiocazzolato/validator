@@ -27,7 +27,6 @@ IMAGE_DB_FILE = 'image_db.json'
 IMAGES_TAG = 'images'
 METADATA_TAG = 'metadata'
 
-
 """
 This represents an architecture used for images and snaps
 """
@@ -475,7 +474,11 @@ class ImageProcessor:
 
     def sync_image(self):
         dirname = os.path.basename(self.image.output_dir)
-        line = 'gsutil -o GSUtil:parallel_composite_upload_threshold=2000M rsync -d -r {} {}/{}'.format(self.image.output_dir, S3_BUCKET_NAME, dirname)
+        proxy = os.environment['HTTP_PROXY']
+        gsutil_config='-o GSUtil:parallel_composite_upload_threshold=2000M'
+        if proxy:
+            gsutil_config = '{} -o Boto:proxy=squid.internal -o Boto:proxy_port=3128'.format(gsutil_config)
+        line = 'gsutil {} rsync -d -r {} {}/{}'.format(gsutil_config, self.image.output_dir, S3_BUCKET_NAME, dirname)
         logging.info('Running command line: {}'.format(line))
         subprocess.call(line, shell=True)
 
